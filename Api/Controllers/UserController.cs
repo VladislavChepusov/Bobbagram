@@ -3,6 +3,7 @@ using Api.Services;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using DAL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +29,25 @@ namespace Api.Controllers
 
         // Гет запрос возвращение списка пользователей из БД
         [HttpGet]
+        [Authorize]
         public async Task<List<UserModel>> GeteUsers() => await _userService.GeteUsers();
-         
+
+        // Гет запрос возвращение отдельного(авторизованного) пользователя из БД
+        [HttpGet]
+        [Authorize]
+        public async Task<UserModel> GetCurrentUser()
+        {
+            var userIdString = User.Claims.FirstOrDefault(x => x.Type == "id")?.Value; // Берем ID текущего пользователя
+            if (Guid.TryParse(userIdString, out var userId)) // Если можно спарсить строку в userID то
+            {
+
+                return await _userService.GetUser(userId);
+            }
+            else
+                throw new Exception("you are not authorized");
+
+        }
+
     }
 }
   

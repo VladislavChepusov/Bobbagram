@@ -1,5 +1,6 @@
 ﻿namespace Api.Models
 {
+    // Модель пользователя
     public class UserModel
     {
         public Guid Id { get; set; }
