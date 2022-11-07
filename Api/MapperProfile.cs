@@ -13,8 +13,10 @@ namespace Api
                .ForMember(d => d.PasswordHash, m => m.MapFrom(s => HashHelper.GetHash(s.Password)))
                .ForMember(d => d.BirthDate, m => m.MapFrom(s => s.BirthDate.UtcDateTime))
                ;
-            // мапа для отображения данных
+            // мапа для отображения данных пользоватдя
             CreateMap<DAL.Entities.User, Models.UserModel>();
+
+            CreateMap<DAL.Entities.Avatar, Models.AttachModel>();
         }
     }
 }

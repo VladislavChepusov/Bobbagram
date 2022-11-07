@@ -48,10 +48,35 @@ namespace Api.Services
             return await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
         }
 
+        // Добавление аватарки пользователя
+        public async Task AddAvatarToUser(Guid userId, MetadataModel meta, string filePath)
+        {
+            var user = await _context.Users.Include(x => x.Avatar).FirstOrDefaultAsync(x => x.Id == userId);
+            if (user != null)
+            {
+                var avatar = new Avatar { Author = user, 
+                    MimeType = meta.MimeType, 
+                    FilePath = filePath, 
+                    Name = meta.Name, 
+                    Size = meta.Size };
+                user.Avatar = avatar;
+
+                await _context.SaveChangesAsync();
+            }
+
+        }
+
+        public async Task<AttachModel> GetUserAvatar(Guid userId)
+        {
+            var user = await GetUserById(userId);
+            var atach = _mapper.Map<AttachModel>(user.Avatar);
+            return atach;
+        }
+
         // Удалить пользователя
         public async Task Delete(Guid id)
         {
-            var dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var dbUser = await GetUserById(id);
             if (dbUser != null)
             {
                 _context.Users.Remove(dbUser);
@@ -62,7 +87,8 @@ namespace Api.Services
         // Возвращает пользователя по ID
         private async Task<DAL.Entities.User> GetUserById(Guid id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            //var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.Include(x => x.Avatar).FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
                 throw new Exception("user not found");
             return user;
