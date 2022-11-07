@@ -4,6 +4,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Common;
 using DAL;
+using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -12,7 +13,7 @@ using System.Security.Claims;
 
 namespace Api.Services
 {
-    public class UserService
+    public class UserService : IDisposable
     {
         private readonly IMapper _mapper;
         private readonly DAL.DataContext _context;
@@ -25,18 +26,37 @@ namespace Api.Services
             _context = context;
             _config = config.Value;
         }
-        //Сохранение данных о пользовате в БД
-        public async Task CreateUser(CreateUserModel model)
+
+        // Сохранение данных о пользовате в БД
+        public async Task<Guid> CreateUser(CreateUserModel model)
         {
             var dbUser = _mapper.Map<DAL.Entities.User>(model);
-            await _context.Users.AddAsync(dbUser);
+            var t = await _context.Users.AddAsync(dbUser);
             await _context.SaveChangesAsync();
+            return t.Entity.Id;
         }
 
         // Вернуть список пользователей
         public async Task<List<UserModel>> GeteUsers()
         {
             return await _context.Users.AsNoTracking().ProjectTo<UserModel>(_mapper.ConfigurationProvider).ToListAsync();
+        }
+
+        // Проверерть существует ли такой пользователь
+        public async Task<bool> CheckUserExist(string email)
+        {
+            return await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
+        }
+
+        // Удалить пользователя
+        public async Task Delete(Guid id)
+        {
+            var dbUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if (dbUser != null)
+            {
+                _context.Users.Remove(dbUser);
+                await _context.SaveChangesAsync();
+            }
         }
 
         // Возвращает пользователя по ID
@@ -52,9 +72,7 @@ namespace Api.Services
         public async Task<UserModel> GetUser(Guid id)
         {
             var user = await GetUserById(id);
-
             return _mapper.Map<UserModel>(user);
-
         }
 
         // Проверить есть ли данных пользователь в БД.Проверить верный ли пароль
@@ -70,19 +88,25 @@ namespace Api.Services
             return user;
         }
 
-        // Генеррация токенов   
-        private TokenModel GenerateTokens(DAL.Entities.User user)
+        // Генеррация токенов (внутри создание и обновление сессии)
+        private TokenModel GenerateTokens(DAL.Entities.UserSession session)
         {
             var dtNow = DateTime.Now; // текущее дата+время для жизни токена
-           
+
+            if (session.User == null)
+                throw new Exception("magic??");
+
             var jwt = new JwtSecurityToken(  // json web token - настройки
                 issuer: _config.Issuer,
                 audience: _config.Audience,
                 notBefore: dtNow,
+
                 claims: new Claim[] {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, user.Name),
-            new Claim("id", user.Id.ToString()),
+            new Claim(ClaimsIdentity.DefaultNameClaimType, session.User.Name),
+            new Claim("sessionId", session.Id.ToString()),
+            new Claim("id", session.User.Id.ToString()),
             },
+
                 expires: DateTime.Now.AddMinutes(_config.LifeTime),
                 signingCredentials: new SigningCredentials(_config.SymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)
                 );
@@ -92,23 +116,31 @@ namespace Api.Services
             // рефреш токен
             var refresh = new JwtSecurityToken(
                 notBefore: dtNow,
+
                 claims: new Claim[] {
-                new Claim("id", user.Id.ToString()), // будет в токене ID
+                new Claim("refreshToken", session.RefreshToken.ToString()), // будет в токене ID
                 },
+
                 expires: DateTime.Now.AddHours(_config.LifeTime),
                 signingCredentials: new SigningCredentials(_config.SymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)
                 );
             var encodedRefresh = new JwtSecurityTokenHandler().WriteToken(refresh);
-
             return new TokenModel(encodedJwt, encodedRefresh);
-
         }
 
-        // Верунть пользователю токен авторизации
+        // Верунть пользователю токен авторизации(в нем хранится пользователь и текущая сессия)
         public async Task<TokenModel> GetToken(string login, string password)
         {
             var user = await GetUserByCredention(login, password);
-            return GenerateTokens(user);
+            var session = await _context.UserSessions.AddAsync(new DAL.Entities.UserSession
+            {
+                User = user,
+                RefreshToken = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Id = Guid.NewGuid()
+            });
+            await _context.SaveChangesAsync();
+            return GenerateTokens(session.Entity);
         }
 
         // Вовзращение онбовленные токены! (вводим рефреш старый получаем новые ацес и рефреш)
@@ -133,11 +165,19 @@ namespace Api.Services
                 throw new SecurityTokenException("invalid token");
             }
 
-            if (principal.Claims.FirstOrDefault(x => x.Type == "id")?.Value is String userIdString
-                && Guid.TryParse(userIdString, out var userId))
+            if (principal.Claims.FirstOrDefault(x => x.Type == "refreshToken")?.Value is String refreshIdString
+                 && Guid.TryParse(refreshIdString, out var refreshId)
+                 )
             {
-                var user = await GetUserById(userId);
-                return GenerateTokens(user);
+                var session = await GetSessionByRefreshToken(refreshId);
+                if (!session.IsActive)
+                {
+                    throw new Exception("session is not active");
+                }
+                // новая сессия 
+                session.RefreshToken = Guid.NewGuid();
+                await _context.SaveChangesAsync();
+                return GenerateTokens(session);
             }
             else
             {
@@ -145,6 +185,31 @@ namespace Api.Services
             }
         }
 
+        // Вернуть сессию по id
+        public async Task<UserSession> GetSessionById(Guid id)
+        {
+            var session = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == id);
+            if (session == null)
+            {
+                throw new Exception("session is not found");
+            }
+            return session;
+        }
+        private async Task<UserSession> GetSessionByRefreshToken(Guid id)
+        {
+            var session = await _context.UserSessions.Include(x => x.User).FirstOrDefaultAsync(x => x.RefreshToken == id);
+            if (session == null)
+            {
+                throw new Exception("session is not found");
+            }
+            return session;
+        }
+
+        //Очистка данных??
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
 
     }
 }

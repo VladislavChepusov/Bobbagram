@@ -1,4 +1,5 @@
 using Api;
+using DAL;
 using Api.Configs;
 using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -62,9 +63,10 @@ internal class Program
         {
             // Описываем какой провайдер используем,а также указываем строчку подключения
             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), sql => { });
-        });
+        }, contextLifetime: ServiceLifetime.Scoped);
+        // contextLifetime: ServiceLifetime.Scoped); изменили время жизни контекста на скоп
 
-        
+
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);// Добавление автомаппера
 
         builder.Services.AddScoped<UserService>(); // Добавление сервис 
@@ -131,7 +133,8 @@ internal class Program
         app.UseAuthentication();
         // Используем авторизацию
         app.UseAuthorization();
-
+        // Используем валидацию токенов
+        app.UseTokenValidator();
         app.MapControllers();
 
         app.Run();

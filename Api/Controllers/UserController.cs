@@ -24,8 +24,14 @@ namespace Api.Controllers
 
         // Пост запрос на отправку данных и сохранение их в БД
         [HttpPost]
-        public async Task CreateUser(CreateUserModel model) => await _userService.CreateUser(model);
+        // public async Task CreateUser(CreateUserModel model) => await _userService.CreateUser(model);
+        public async Task CreateUser(CreateUserModel model)
+        {
+            if (await _userService.CheckUserExist(model.Email))
+                throw new Exception("user is exist");
+            await _userService.CreateUser(model);
 
+        }
 
         // Гет запрос возвращение списка пользователей из БД
         [HttpGet]

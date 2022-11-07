@@ -27,5 +27,6 @@ namespace DAL
             => optionsBuilder.UseNpgsql(b => b.MigrationsAssembly("Api")); // Указывает где у нас прописаны миграции ?
 
         public DbSet<User> Users => Set <User>();
+        public DbSet<UserSession> UserSessions => Set<UserSession>();
     }
 }
