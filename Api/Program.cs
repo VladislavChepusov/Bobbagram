@@ -123,6 +123,7 @@ internal class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
         // Прописывае api
         app.UseHttpsRedirection();
         // Используем аутентификацию 
