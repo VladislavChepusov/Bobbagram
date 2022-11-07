@@ -104,8 +104,6 @@ internal class Program
         });
 
 
-
-
         var app = builder.Build();
 
         // Указываем,что при каждом запуске приложения должны выполняться миграции,чтобы обнолвения происходили сами
@@ -119,14 +117,12 @@ internal class Program
             }
         }
 
-
         // Configure the HTTP request pipeline.
         //if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
         // Прописывае api
         app.UseHttpsRedirection();
         // Используем аутентификацию 
@@ -136,7 +132,7 @@ internal class Program
         // Используем валидацию токенов
         app.UseTokenValidator();
         app.MapControllers();
-
+        // Запуск
         app.Run();
     }
 }
