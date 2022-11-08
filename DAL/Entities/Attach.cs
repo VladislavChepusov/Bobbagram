@@ -9,12 +9,11 @@ namespace DAL.Entities
     // загружаемое пользователем 
     public class Attach
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string MimeType { get; set; } = null!; // тип файла
         public string FilePath { get; set; } = null!; // расположения файла
         public long Size { get; set; } // размерз файла 
-
-        public virtual User Author { get; set; }
+        public virtual User Author { get; set; } = null!;
     }
 }

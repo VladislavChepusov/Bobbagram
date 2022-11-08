@@ -14,7 +14,7 @@ namespace DAL
         {
 
         }
-        //Модификации (Поле Емеил доожно быть уникальным
+        //Модификации (Поле Емеил доожно быть уникальным)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
@@ -25,13 +25,19 @@ namespace DAL
             modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
         }
 
+        // Указывает где у нас будут прописываться миграции (API>Migrations)
+        // скачать пакет npgsql для миграций
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql(b => b.MigrationsAssembly("Api")); // Указывает где у нас прописаны миграции ?
+            => optionsBuilder.UseNpgsql(b => b.MigrationsAssembly("Api")); 
 
         // Оповещаем об появлении новых таблиц
         public DbSet<User> Users => Set <User>();
         public DbSet<UserSession> UserSessions => Set<UserSession>();
         public DbSet<Attach> Attaches => Set<Attach>();
         public DbSet<Avatar> Avatars => Set<Avatar>();
+        // DbSet<UserPost> UserPosts => Set<UserPost>();
+      //  public DbSet<Comment> Comments => Set<Comment>();
+       // public DbSet<PostContent> PostContents => Set<PostContent>();
+
     }
 }

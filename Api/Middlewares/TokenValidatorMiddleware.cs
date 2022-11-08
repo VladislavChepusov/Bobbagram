@@ -1,8 +1,10 @@
 ﻿using Api.Services;
+using Common.Consts;
+using Common.Extentions;
 
-namespace Api
+namespace Api.Middlewares
 {
-    
+
     public class TokenValidatorMiddleware
     {
         private readonly RequestDelegate _next;
@@ -12,14 +14,14 @@ namespace Api
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, UserService userService)
+        public async Task InvokeAsync(HttpContext context, AuthService authService)
         {
             var isOk = true;
             // Получаем из пользователя поле sessionId
-            var sessionIdString = context.User.Claims.FirstOrDefault(x => x.Type == "sessionId")?.Value;
-            if (Guid.TryParse(sessionIdString, out var sessionId))
+            var sessionId = context.User.GetClaimValue<Guid>(ClaimNames.SessionId);
+            if (sessionId != default)
             {
-                var session = await userService.GetSessionById(sessionId);
+                var session = await authService.GetSessionById(sessionId);
                 if (!session.IsActive)
                 {
                     isOk = false;

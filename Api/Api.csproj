@@ -23,4 +23,9 @@
     <ProjectReference Include="..\DAL\DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="attaches\" />
+    <Folder Include="Models\Attach\" />
+  </ItemGroup>
+
 </Project>

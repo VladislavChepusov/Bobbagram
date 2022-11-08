@@ -10,7 +10,7 @@ namespace Api.Controllers
     public class AttachController : ControllerBase
     {
 
-        // Пост запрос Загрузки n-го количества файлов
+        // Пост запрос Загрузки n-го количества файлов(во временное хранилище)
         [HttpPost]
         public async Task<List<MetadataModel>> UploadFiles([FromForm] List<IFormFile> files)
         {
@@ -22,11 +22,10 @@ namespace Api.Controllers
             return res;
         }
 
-        // Функция загрузки одного файла 
+        // Функция загрузки одного файла (во временное хранилище)
         private async Task<MetadataModel> UploadFile(IFormFile file)
         {
-            var tempPath = Path.GetTempPath();// папка временных файлов
-            
+            var tempPath = Path.GetTempPath();// папка временных файлов(Temp на пк)
             var meta = new MetadataModel // Мета информация о файле
             {
                 TempId = Guid.NewGuid(),
@@ -45,16 +44,6 @@ namespace Api.Controllers
             }
             else
             {
-                if (fileinfo.Directory == null)
-                {
-                    throw new Exception("temp is null");
-                }
-                else
-                if (!fileinfo.Directory.Exists)
-                {
-                    fileinfo.Directory?.Create();// создаем директорию если ее нет
-                }
-
                 using (var stream = System.IO.File.Create(newPath)) // используем поток для записи файла
                 {
                     await file.CopyToAsync(stream);

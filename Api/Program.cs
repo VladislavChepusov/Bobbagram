@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Api.Middlewares;
 
 internal class Program
 {
@@ -69,7 +70,8 @@ internal class Program
 
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);// Добавление автомаппера
 
-        builder.Services.AddScoped<UserService>(); // Добавление сервис 
+        builder.Services.AddScoped<UserService>(); // Добавление сервис пользователя
+        builder.Services.AddScoped<AuthService>();// Добавление сервис авторизации пользователя
 
         // Добавим middleware для JSON Web Token(Аутентификация)
         builder.Services.AddAuthentication(o =>
@@ -132,6 +134,7 @@ internal class Program
         app.UseAuthorization();
         // Используем валидацию токенов
         app.UseTokenValidator();
+
         app.MapControllers();
         // Запуск
         app.Run();

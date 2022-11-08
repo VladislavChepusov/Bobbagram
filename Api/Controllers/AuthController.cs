@@ -9,22 +9,37 @@ namespace Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+    
+        private readonly AuthService _authService;
         private readonly UserService _userService;
 
-        public AuthController(UserService userService)
+        public AuthController(AuthService authService, UserService userService)
         {
+            _authService = authService;
             _userService = userService;
         }
 
         // Получение токенов при аутентификации
         [HttpPost]
         public async Task<TokenModel> Token(TokenRequestModel model)
-            => await _userService.GetToken(model.Login, model.Pass);
+            => await _authService.GetToken(model.Login, model.Pass);
+
 
         // Обновлние токеннов 
         [HttpPost]
         public async Task<TokenModel> RefreshToken(RefreshTokenRequestModel model)
-            => await _userService.GetTokenByRefreshToken(model.RefreshToken);
-        
+            => await _authService.GetTokenByRefreshToken(model.RefreshToken);
+
+        // Обновленный CreateUser
+        //Пост запрос на отправку данных и сохранение их в БД
+        [HttpPost]
+        public async Task RegisterUser(CreateUserModel model)
+        {
+            if (await _userService.CheckUserExist(model.Email))
+                throw new Exception("user is exist");
+            await _userService.CreateUser(model);
+
+        }
+
     }
 }

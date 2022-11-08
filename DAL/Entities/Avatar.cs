@@ -9,6 +9,8 @@ namespace DAL.Entities
     // аватарка пользователя
     public class Avatar : Attach
     {
-        public virtual User User { get; set; }
+        public Guid OwnerId { get; set; }
+        public virtual User Owner { get; set; } = null!;
+       
     }
 }
