@@ -31,7 +31,6 @@ namespace Api.Services
         public async Task CreatePost(CreatePostModel model)
         {
             var dbModel = _mapper.Map<Post>(model);
-
             await _context.Posts.AddAsync(dbModel);
             await _context.SaveChangesAsync();
 
@@ -63,5 +62,42 @@ namespace Api.Services
 
             return _mapper.Map<AttachModel>(res);
         }
+
+
+        public async Task AddCommentToPost(Guid userId, CommentModel model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var post = await _context.Posts.FirstOrDefaultAsync(x => x.Id == model.PostId);
+
+            if (user != null && post != null)
+            {
+                var comment = new Comment { 
+                    Author = user, 
+                    CommentText = model.CommentText,
+                    Created = DateTime.UtcNow,
+                    PostId = model.PostId };
+
+                post.PostComments.Add(comment);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<GetCommentsRequestModel>> GetCommentsFromPost(Guid postId)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(x => x.Id == postId);
+            List<GetCommentsRequestModel> comments = new List<GetCommentsRequestModel>();
+            if (post != null)
+            {
+                foreach (var comment in post.PostComments)
+                {
+                    comments.Add(_mapper.Map<GetCommentsRequestModel>(comment));
+                }
+            }
+            return comments;
+        }
+
+
+
+
     }
 }

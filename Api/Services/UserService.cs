@@ -88,30 +88,6 @@ namespace Api.Services
         }
 
 
-
-        // Добавление поста ? пользователя
-        /*
-        public async Task AddPostToUser(Guid userId, MetadataModel meta, string filePath)
-        {
-            var user = await _context.Users.Include(x => x.Avatar).FirstOrDefaultAsync(x => x.Id == userId);
-            if (user != null)
-            {
-                var avatar = new Avatar
-                {
-                    Author = user,
-                    MimeType = meta.MimeType,
-                    FilePath = filePath,
-                    Name = meta.Name,
-                    Size = meta.Size
-                };
-                user.Avatar = avatar;
-
-                await _context.SaveChangesAsync(); // сохранить данные в бд
-            }
-        }
-        */
-
-
         // Удалить пользователя
         public async Task Delete(Guid id)
         {
