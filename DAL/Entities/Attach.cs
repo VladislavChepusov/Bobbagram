@@ -15,5 +15,7 @@ namespace DAL.Entities
         public string FilePath { get; set; } = null!; // расположения файла
         public long Size { get; set; } // размерз файла 
         public virtual User Author { get; set; } = null!;
+
+        public Guid AuthorId { get; set; }
     }
 }

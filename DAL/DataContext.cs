@@ -23,6 +23,8 @@ namespace DAL
                 .IsUnique();
 
             modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
+
+            modelBuilder.Entity<PostContent>().ToTable(nameof(PostContent));
         }
 
         // Указывает где у нас будут прописываться миграции (API>Migrations)
@@ -35,9 +37,11 @@ namespace DAL
         public DbSet<UserSession> UserSessions => Set<UserSession>();
         public DbSet<Attach> Attaches => Set<Attach>();
         public DbSet<Avatar> Avatars => Set<Avatar>();
-        // DbSet<UserPost> UserPosts => Set<UserPost>();
-      //  public DbSet<Comment> Comments => Set<Comment>();
-       // public DbSet<PostContent> PostContents => Set<PostContent>();
+
+        public DbSet<Post> Posts => Set<Post>();
+        public DbSet<PostContent> PostContents => Set<PostContent>();
+       // public DbSet<Comment> Comments => Set<Comment>();
+
 
     }
 }

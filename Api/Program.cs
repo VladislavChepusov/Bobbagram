@@ -72,6 +72,7 @@ internal class Program
 
         builder.Services.AddScoped<UserService>(); // Добавление сервис пользователя
         builder.Services.AddScoped<AuthService>();// Добавление сервис авторизации пользователя
+        builder.Services.AddScoped<PostService>();// Добавление сервис постов пользователя
 
         // Добавим middleware для JSON Web Token(Аутентификация)
         builder.Services.AddAuthentication(o =>

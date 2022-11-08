@@ -1,5 +1,6 @@
 ﻿using Api.Configs;
-using Api.Models;
+using Api.Models.Attach;
+using Api.Models.User;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Common;
@@ -136,7 +137,8 @@ namespace Api.Services
         public async Task<UserAvatarModel> GetUser(Guid id)
         {
             var user = await GetUserById(id);
-            return new UserAvatarModel(_mapper.Map<UserModel>(user), _linkGenerator);
+          //  return new UserAvatarModel(_mapper.Map<UserModel>(user), _linkGenerator);
+            return new UserAvatarModel(_mapper.Map<UserModel>(user), user.Avatar == null ? null : _linkGenerator);
         }
 
 

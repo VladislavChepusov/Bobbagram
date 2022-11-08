@@ -8,6 +8,6 @@ namespace DAL.Entities
 {
     public class PostContent:Attach
     {
-        public virtual UserPost Post { get; set; } = null!;
+        public virtual Post Post { get; set; } = null!;
     }
 }

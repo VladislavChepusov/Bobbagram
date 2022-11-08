@@ -1,6 +1,6 @@
-﻿namespace Api.Models
+﻿namespace Api.Models.Token
 {
-   
+
     public class TokenRequestModel
     {
         // Модель нужная для аутентификации

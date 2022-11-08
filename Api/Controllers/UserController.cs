@@ -1,4 +1,5 @@
-﻿using Api.Models;
+﻿using Api.Models.Attach;
+using Api.Models.User;
 using Api.Services;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;

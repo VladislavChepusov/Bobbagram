@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Api.Models
+namespace Api.Models.User
 {
     // Модель создания пользователя,с проверкой ввода обязательных полей и идентичностей паролей 
     public class CreateUserModel

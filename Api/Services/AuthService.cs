@@ -1,5 +1,4 @@
 ﻿using Api.Configs;
-using Api.Models;
 using AutoMapper;
 using Common.Consts;
 using Common;
@@ -12,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using AutoMapper.QueryableExtensions;
+using Api.Models.Token;
 
 namespace Api.Services
 {
