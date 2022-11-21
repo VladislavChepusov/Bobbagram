@@ -14,11 +14,9 @@ namespace DAL.Entities
         // Автор комментария
         public virtual User Author { get; set; } = null!;
         //Текст комментария
-        public string CommentText { get; set; } = null!;
+        public string Text { get; set; } = null!;
         // Дата|Время написания комментария 
-        public DateTimeOffset Created { get; set; }
-
-
-
+        public DateTimeOffset MadeOn { get; set; }
+        
     }
 }

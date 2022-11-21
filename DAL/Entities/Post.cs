@@ -14,9 +14,8 @@ namespace DAL.Entities
         public virtual User Author { get; set; } = null!;
         public DateTimeOffset Created { get; set; }
         public virtual ICollection<PostContent>? PostContents { get; set; }
-        public List<Comment> PostComments { get; set; } = new List<Comment>();
         //public virtual ICollection<PostContent>? PostComments { get; set; }
-
+       // public List<Comment> PostComments { get; set; } = new List<Comment>();
 
 
     }

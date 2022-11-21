@@ -2,8 +2,9 @@
 {
     public class CommentModel
     {
-        public string CommentText { get; set; }
         public Guid PostId { get; set; }
+        public string Text { get; set; }
+        public DateTimeOffset MadeOn { get; set; }
 
     }
 }
