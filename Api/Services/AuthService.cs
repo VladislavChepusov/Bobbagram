@@ -51,7 +51,7 @@ namespace Api.Services
         // Вовзращение онбовленные токены! (вводим рефреш старый получаем новые ацес и рефреш)
         public async Task<TokenModel> GetTokenByRefreshToken(string refreshToken)
         {
-            // Настройки токена
+            // Параметры Валидации токена
             var validParams = new TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -62,7 +62,8 @@ namespace Api.Services
             };
 
             var principal = new JwtSecurityTokenHandler().ValidateToken(refreshToken, validParams, out var securityToken);
-
+            //securityToken это refreshToken ток не строка а объект
+            // тут проверка валидации токена
             if (securityToken is not JwtSecurityToken jwtToken
                 || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
                 StringComparison.InvariantCultureIgnoreCase))
@@ -103,11 +104,6 @@ namespace Api.Services
         }
 
 
-      
-
-    
-
-
         // Проверить есть ли данный пользователь в БД(по логину и паролю).
         // Проверить верный ли пароль
         private async Task<User> GetUserByCredention(string login, string pass)
@@ -128,24 +124,22 @@ namespace Api.Services
         {
             var dtNow = DateTime.Now; // текущее дата+время для жизни токена
 
-            if (session.User == null) //Зачем?
-                throw new Exception("magic??");
-
+            //Описание токена
             var jwt = new JwtSecurityToken(  // json web token - настройки
                 issuer: _config.Issuer,
                 audience: _config.Audience,
                 notBefore: dtNow,
 
                 claims: new Claim[] {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, session.User.Name),
-            new Claim("sessionId", session.Id.ToString()),
-            new Claim("id", session.User.Id.ToString()),
-            },
+                            new Claim(ClaimsIdentity.DefaultNameClaimType, session.User.Name),
+                            new Claim("sessionId", session.Id.ToString()),
+                            new Claim("id", session.User.Id.ToString()),
+                            },
 
                 expires: DateTime.Now.AddMinutes(_config.LifeTime),
                 signingCredentials: new SigningCredentials(_config.SymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)
                 );
-            // ацес токен
+            // Подписываем токен 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             // рефреш токен

@@ -36,8 +36,10 @@ namespace Api.Controllers
         [HttpPost]
         public async Task RegisterUser(CreateUserModel model)
         {
+            // добавить проверку юзернейма !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if (await _userService.CheckUserExist(model.Email))
                 throw new Exception("user is exist");
+
             await _userService.CreateUser(model);
 
         }

@@ -13,6 +13,8 @@ namespace DAL.Entities
         public Guid AuthorId { get; set; }
         public virtual User Author { get; set; } = null!;
         public DateTimeOffset Created { get; set; }
+
+
         public virtual ICollection<PostContent>? PostContents { get; set; }
         //public virtual ICollection<PostContent>? PostComments { get; set; }
        // public List<Comment> PostComments { get; set; } = new List<Comment>();

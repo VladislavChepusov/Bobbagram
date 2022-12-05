@@ -37,6 +37,7 @@ namespace Api.Middlewares
     }
     public static class TokenValidatorMiddlewareExtensions
     {
+        // регистрируем кастомную валидацию
         public static IApplicationBuilder UseTokenValidator(
             this IApplicationBuilder builder)
         {

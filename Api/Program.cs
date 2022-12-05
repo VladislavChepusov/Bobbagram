@@ -65,7 +65,7 @@ internal class Program
             // Описываем какой провайдер используем,а также указываем строчку подключения
             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), sql => { });
         }, contextLifetime: ServiceLifetime.Scoped);
-        // contextLifetime: ServiceLifetime.Scoped); изменили время жизни контекста на скоп
+        // contextLifetime: ServiceLifetime.Scoped); изменил время жизни контекста на скоп
 
 
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);// Добавление автомаппера
@@ -74,7 +74,7 @@ internal class Program
         builder.Services.AddScoped<AuthService>();// Добавление сервис авторизации пользователя
         builder.Services.AddScoped<PostService>();// Добавление сервис постов пользователя
 
-        // Добавим middleware для JSON Web Token(Аутентификация)
+        // Добавим middleware для JSON Web Token(Аутентификация),чтобы система знала как проверять токен
         builder.Services.AddAuthentication(o =>
         {
             o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,14 +95,14 @@ internal class Program
             };
         });
 
-        // Добавляем параметры авторизации
+        // Добавляем параметры авторизации,чтобы прога понимала что мы берем юзеров из токена
         builder.Services.AddAuthorization(o =>
         {
             // Добавляем политику проверки токена
             o.AddPolicy("ValidAccessToken", p =>
             {
                 p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                p.RequireAuthenticatedUser();
+                p.RequireAuthenticatedUser();//требуем аунтефиц юзера 
             });
         });
 
@@ -133,7 +133,7 @@ internal class Program
         app.UseAuthentication();
         // Используем авторизацию
         app.UseAuthorization();
-        // Используем валидацию токенов
+        // Используем (кастомную)валидацию токенов
         app.UseTokenValidator();
 
         app.MapControllers();

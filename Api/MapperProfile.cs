@@ -13,11 +13,12 @@ namespace Api
             // мапа для добавление данных
             CreateMap<CreateUserModel, DAL.Entities.User>()
                .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
+               //хэшируем пароль
                .ForMember(d => d.PasswordHash, m => m.MapFrom(s => HashHelper.GetHash(s.Password)))
                //время UTC
-               .ForMember(d => d.BirthDate, m => m.MapFrom(s => s.BirthDate.UtcDateTime))
-               ;
-            // мапа для отображения данных пользоватдя
+               .ForMember(d => d.BirthDate, m => m.MapFrom(s => s.BirthDate.UtcDateTime));
+
+            // мапа для отображения данных о пользователях
             CreateMap<DAL.Entities.User, UserModel>();
 
             CreateMap<DAL.Entities.Avatar, AttachModel>();
@@ -26,11 +27,10 @@ namespace Api
 
             CreateMap<MetadataModel, DAL.Entities.PostContent>();
             CreateMap<MetaWithPath, DAL.Entities.PostContent>();
+
             CreateMap<CreatePostModel, DAL.Entities.Post>()
                 .ForMember(d => d.PostContents, m => m.MapFrom(s => s.Contents))
-                .ForMember(d => d.Created, m => m.MapFrom(s => DateTime.UtcNow))
-
-                ;
+                .ForMember(d => d.Created, m => m.MapFrom(s => DateTime.UtcNow));
         }
     }
 }

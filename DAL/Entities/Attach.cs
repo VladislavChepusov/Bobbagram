@@ -14,8 +14,9 @@ namespace DAL.Entities
         public string MimeType { get; set; } = null!; // тип файла
         public string FilePath { get; set; } = null!; // расположения файла
         public long Size { get; set; } // размерз файла 
-        public virtual User Author { get; set; } = null!;
-
         public Guid AuthorId { get; set; }
+
+        public virtual User Author { get; set; } = null!;
+      
     }
 }

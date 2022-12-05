@@ -8,25 +8,32 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
+    //Взаимодействие с базой данных в Entity Framework Core происходит
+    //посредством специального класса - контекста данных.
     public class DataContext:DbContext
     {
         public DataContext(DbContextOptions<DataContext> options):base(options)
         {
-
         }
-        //Модификации (Поле Емеил доожно быть уникальным)
+        //Модификации (Поле Емеил и Юзернейм доожны быть уникальным)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .Entity<User>()
                 .HasIndex(f => f.Email)
                 .IsUnique();
+            modelBuilder
+               .Entity<User>()
+               .HasIndex(f => f.Name)
+               .IsUnique();
 
+            //сопоставление с таблицей
             modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
-
             modelBuilder.Entity<PostContent>().ToTable(nameof(PostContent));
         }
 
+
+        // Переопределел метод конфигурации
         // Указывает где у нас будут прописываться миграции (API>Migrations)
         // скачать пакет npgsql для миграций
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -45,7 +45,7 @@ namespace Api.Services
             return users.Select(x => new UserAvatarModel(x, _linkGenerator));
         }
 
-        // Проверерть существует ли такой пользователь
+        // Проверерть существует ли такой пользователь 
         public async Task<bool> CheckUserExist(string email)
         {
             return await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
@@ -79,6 +79,7 @@ namespace Api.Services
         // Закрыть сессию пользователя!!
         public async Task CloseAllSessionByIdUser(Guid id_user)
         {
+            // Взять метол  GetSessionById !!!!!!!!!!!!!!!
             var session = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == id_user);
             if (session != null)
             {
@@ -112,8 +113,8 @@ namespace Api.Services
         */
 
 
-        // Удалить пользователя
-        public async Task Delete(Guid id)
+        // Удалить пользователя из БД
+        public async Task DeleteAccount(Guid id)
         {
             var dbUser = await GetUserById(id);
             if (dbUser != null)

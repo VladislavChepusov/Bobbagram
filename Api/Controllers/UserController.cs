@@ -1,16 +1,10 @@
 ﻿using Api.Models.Attach;
 using Api.Models.User;
 using Api.Services;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Common.Consts;
 using Common.Extentions;
-using DAL;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Api.Controllers
 {
@@ -39,7 +33,7 @@ namespace Api.Controllers
            
             if (userId != default)
             {
-                await _userService.Delete(userId);
+                await _userService.DeleteAccount(userId);
                 await _userService.CloseAllSessionByIdUser(SessionId);
             }
             else
@@ -59,9 +53,11 @@ namespace Api.Controllers
         }
         */
 
+
         // Гет запрос возвращение списка пользователей из БД
         [HttpGet]
-        public async Task<IEnumerable<UserAvatarModel>> GetUsers() => await _userService.GetUsers();
+        public async Task<IEnumerable<UserAvatarModel>> GetUsers() 
+            => await _userService.GetUsers();
 
 
         // Гет запрос возвращение отдельного(авторизованного) пользователя из БД
@@ -71,7 +67,6 @@ namespace Api.Controllers
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);// Берем ID текущего пользователя
             if (userId != default)
             {
-
                 return await _userService.GetUser(userId);
             }
             else
