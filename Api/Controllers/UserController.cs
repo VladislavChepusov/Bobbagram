@@ -18,13 +18,17 @@ namespace Api.Controllers
         public UserController(UserService userService)
         {
             _userService = userService;
-            if (userService != null)
-                _userService.SetLinkGenerator(x =>
-                Url.Action(nameof(GetUserAvatar), new { userId = x.Id, download = false }));
+
+            _userService.SetLinkGenerator(x =>
+            Url.ControllerAction<AttachController>(nameof(AttachController.GetUserAvatar), new
+             {
+                 userId = x.Id,
+             }));
+            
         }
 
 
-        // Удаление акаунта пользователя
+        // Удаление акаунта пользователя (ВЫНЕСТИ ЛОГИКУ В СЕРВИС!!!!!!!)
         [HttpDelete]
         public async Task DeleteMyAccount()
         {
@@ -40,19 +44,6 @@ namespace Api.Controllers
                 throw new Exception("you are not authorized");
 
         }
-
-        // Пост запрос на отправку данных и сохранение их в БД
-        /*
-        [HttpPost]
-        public async Task CreateUser(CreateUserModel model)
-        {
-            if (await _userService.CheckUserExist(model.Email))
-                throw new Exception("user is exist");
-            await _userService.CreateUser(model);
-
-        }
-        */
-
 
         // Гет запрос возвращение списка пользователей из БД
         [HttpGet]
@@ -98,35 +89,6 @@ namespace Api.Controllers
             }
             else
                 throw new Exception("you are not authorized");
-        }
-
-
-        // Получить аватар пользователя по его ID
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<FileStreamResult> GetUserAvatar(Guid userId, bool download = false)
-        {
-            var attach = await _userService.GetUserAvatar(userId);
-            var fs = new FileStream(attach.FilePath, FileMode.Open);
-            if (download)
-                return File(fs, attach.MimeType, attach.Name);
-            else
-                return File(fs, attach.MimeType);
-        }
-
-        // вернуть аватар пользователю
-        // если true скачать аватар пользователя по id 
-        [HttpGet]
-        public async Task<FileStreamResult> GetCurentUserAvatar(bool download = false)
-        {
-            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
-            if (userId != default)
-            {
-                return await GetUserAvatar(userId, download);
-            }
-            else
-                throw new Exception("you are not authorized");
-
         }
 
     }

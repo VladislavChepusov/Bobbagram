@@ -6,8 +6,9 @@ using Common;
 
 namespace Api
 {
-    public class MapperProfile:Profile
+    public class MapperProfile : Profile
     {
+        // Из чего>во что мутируют данные
         public MapperProfile()
         {
             // мапа для добавление данных
@@ -20,13 +21,18 @@ namespace Api
 
             // мапа для отображения данных о пользователях
             CreateMap<DAL.Entities.User, UserModel>();
+            CreateMap<DAL.Entities.User, UserAvatarModel>();
 
             CreateMap<DAL.Entities.Avatar, AttachModel>();
 
-            CreateMap<DAL.Entities.PostContent, AttachModel>();
 
-            CreateMap<MetadataModel, DAL.Entities.PostContent>();
-            CreateMap<MetaWithPath, DAL.Entities.PostContent>();
+            CreateMap<DAL.Entities.PostContent, AttachModel>();
+            CreateMap<DAL.Entities.PostContent, AttachExternalModel>();
+
+            CreateMap<CreatePostRequest, CreatePostModel>();
+            CreateMap<MetadataModel, MetadataLinkModel>();
+            CreateMap<MetadataLinkModel, DAL.Entities.PostContent>();
+
 
             CreateMap<CreatePostModel, DAL.Entities.Post>()
                 .ForMember(d => d.PostContents, m => m.MapFrom(s => s.Contents))

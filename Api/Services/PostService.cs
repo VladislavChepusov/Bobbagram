@@ -15,9 +15,10 @@ namespace Api.Services
     {
         private readonly IMapper _mapper;
         private readonly DAL.DataContext _context;
-        private Func<AttachModel, string?>? _linkContentGenerator;
-        private Func<UserModel, string?>? _linkAvatarGenerator;
-        public void SetLinkGenerator(Func<AttachModel, string?> linkContentGenerator, Func<UserModel, string?> linkAvatarGenerator)
+        private Func<Guid, string?>? _linkContentGenerator;
+        private Func<Guid, string?>? _linkAvatarGenerator;
+
+        public void SetLinkGenerator(Func<Guid, string?> linkContentGenerator, Func<Guid, string?> linkAvatarGenerator)
         {
             _linkAvatarGenerator = linkAvatarGenerator;
             _linkContentGenerator = linkContentGenerator;
@@ -28,14 +29,35 @@ namespace Api.Services
             _context = context;
         }
 
-        public async Task CreatePost(CreatePostModel model)
-        {
-            var dbModel = _mapper.Map<Post>(model);
 
+        public async Task CreatePost(CreatePostRequest request)
+        {
+            var model = _mapper.Map<CreatePostModel>(request);
+
+            model.Contents.ForEach(x =>
+            {
+                x.AuthorId = model.AuthorId;
+                x.FilePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "attaches",
+                    x.TempId.ToString());
+
+                var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), x.TempId.ToString()));
+                if (tempFi.Exists)
+                {
+                    var destFi = new FileInfo(x.FilePath);
+                    if (destFi.Directory != null && !destFi.Directory.Exists)
+                        destFi.Directory.Create();
+
+                    File.Move(tempFi.FullName, x.FilePath, true);
+                }
+            });
+
+            var dbModel = _mapper.Map<Post>(model);
             await _context.Posts.AddAsync(dbModel);
             await _context.SaveChangesAsync();
-
         }
+
 
         public async Task<List<PostModel>> GetPosts(int skip, int take)
         {
@@ -46,15 +68,25 @@ namespace Api.Services
             var res = posts.Select(post =>
                 new PostModel
                 {
-                    Author = new UserAvatarModel(_mapper.Map<UserModel>(post.Author), post.Author.Avatar == null ? null : _linkAvatarGenerator),
+                    Author = _mapper.Map<User, UserAvatarModel>(post.Author, o => o.AfterMap(FixAvatar)),
                     Description = post.Description,
                     Id = post.Id,
                     Contents = post.PostContents?.Select(x =>
-                    new AttachWithLinkModel(_mapper.Map<AttachModel>(x), _linkContentGenerator)).ToList()
+                    _mapper.Map<PostContent, AttachExternalModel>(x, o => o.AfterMap(FixContent))).ToList()
                 }).ToList();
 
             return res;
 
+        }
+
+        private void FixAvatar(User s, UserAvatarModel d)
+        {
+            d.AvatarLink = s.Avatar == null ? null : _linkAvatarGenerator?.Invoke(s.Id);
+        }
+
+        private void FixContent(PostContent s, AttachExternalModel d)
+        {
+            d.ContentLink = _linkContentGenerator?.Invoke(s.Id);
         }
 
         public async Task<AttachModel> GetPostContent(Guid postContentId)
@@ -63,5 +95,7 @@ namespace Api.Services
 
             return _mapper.Map<AttachModel>(res);
         }
+
+
     }
 }
