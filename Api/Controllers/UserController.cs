@@ -10,26 +10,32 @@ namespace Api.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize]
+    [ApiExplorerSettings(GroupName = "Api")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;  
-        
-        public UserController(UserService userService)
+        private readonly UserService _userService;
+
+        public UserController(UserService userService, LinkGeneratorService links)
         {
             _userService = userService;
 
-            _userService.SetLinkGenerator(x =>
+            links.LinkAvatarGenerator = x =>
             Url.ControllerAction<AttachController>(nameof(AttachController.GetUserAvatar), new
-             {
-                 userId = x.Id,
-             }));
-            
+            {
+                userId = x.Id,
+            });
+        }
+
+        [HttpGet]
+        public async Task<UserAvatarModel> GetUserById(Guid userId)
+        {
+
+            return await _userService.GetUser(userId);
         }
 
 
-        // Удаление акаунта пользователя (ВЫНЕСТИ ЛОГИКУ В СЕРВИС!!!!!!!)
-        [HttpDelete]
+            // Удаление акаунта пользователя (ВЫНЕСТИ ЛОГИКУ В СЕРВИС!!!!!!!)
+            [HttpDelete]
         public async Task DeleteMyAccount()
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);

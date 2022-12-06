@@ -1,4 +1,3 @@
-using Api;
 using DAL;
 using Api.Configs;
 using Api.Services;
@@ -8,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Api.Middlewares;
+using Api.Mapper;
 
 internal class Program
 {
@@ -56,6 +56,9 @@ internal class Program
                     new List<string>()
                 }
             });
+
+            c.SwaggerDoc("Auth", new OpenApiInfo { Title = "Auth" });
+            c.SwaggerDoc("Api", new OpenApiInfo { Title = "Api" });
         });
 
 
@@ -73,6 +76,7 @@ internal class Program
         builder.Services.AddScoped<UserService>(); // Добавление сервис пользователя
         builder.Services.AddScoped<AuthService>();// Добавление сервис авторизации пользователя
         builder.Services.AddScoped<PostService>();// Добавление сервис постов пользователя
+        builder.Services.AddScoped<LinkGeneratorService>();// Добавление сервиса генерации ссылок (аватар,контент)
 
         // Добавим middleware для JSON Web Token(Аутентификация),чтобы система знала как проверять токен
         builder.Services.AddAuthentication(o =>
@@ -124,7 +128,12 @@ internal class Program
         //if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                // Разбиение на несколько сервисов
+                c.SwaggerEndpoint("Api/swagger.json", "Api");
+                c.SwaggerEndpoint("Auth/swagger.json", "Auth");
+            });
         }
 
         // Прописывае api
@@ -135,7 +144,7 @@ internal class Program
         app.UseAuthorization();
         // Используем (кастомную)валидацию токенов
         app.UseTokenValidator();
-
+        app.UseGlobalErrorWrapper();
         app.MapControllers();
         // Запуск
         app.Run();

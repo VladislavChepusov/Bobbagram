@@ -9,6 +9,7 @@ namespace Api.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "Api")]
     // Через данный механизм будем загружать файлы в систему
     public class AttachController : ControllerBase
     {
