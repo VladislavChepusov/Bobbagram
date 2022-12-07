@@ -19,13 +19,16 @@ namespace Api.Models.User
         [Required]
         public DateTimeOffset BirthDate { get; set; }
 
-        public CreateUserModel(string name, string email, string password, string retryPassword, DateTimeOffset birthDate)
+        public string About { get; set; } 
+
+        public CreateUserModel(string name, string email, string password, string retryPassword, DateTimeOffset birthDate, string about)
         {
             Name = name;
             Email = email;
             Password = password;
             RetryPassword = retryPassword;
             BirthDate = birthDate;
+            About = about;
         }
 
     }

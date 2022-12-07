@@ -34,22 +34,62 @@ namespace Api.Controllers
         }
 
 
-            // Удаление акаунта пользователя (ВЫНЕСТИ ЛОГИКУ В СЕРВИС!!!!!!!)
-            [HttpDelete]
+        // Удаление акаунта пользователя 
+        [HttpDelete]
         public async Task DeleteMyAccount()
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
-            var SessionId = User.GetClaimValue<Guid>(ClaimNames.SessionId);
-           
+            //var SessionId = User.GetClaimValue<Guid>(ClaimNames.SessionId);
             if (userId != default)
             {
                 await _userService.DeleteAccount(userId);
-                await _userService.CloseAllSessionByIdUser(SessionId);
+               // await _userService.CloseAllSessionByIdUser(SessionId);
+            }
+            else
+                throw new Exception("you are not authorized");
+        }
+
+        //  изменение данных у юзера
+        [HttpPut]
+        public async Task ChangeMyAccount(ChangeUser model) 
+        {
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            
+            if (userId != default)
+            {
+                var user = await _userService.GetUser(userId);
+
+                if (await _userService.CheckUserExist(model.Email) && model.Email != user.Email)
+                    throw new Exception("A user with this email already exists");
+                if (await _userService.CheckUserNameExist(model.Name) && model.Name != user.Name)
+                    throw new Exception("A user with this name already exists");
+
+                await _userService.ChangeUser(userId, model); 
+            }
+            else
+                throw new Exception("you are not authorized");
+        }
+
+
+
+
+        
+
+        // Изменение паролей на аккаунте
+        [HttpPut]
+        public async Task ChangeMyPassword(ChangeUserPassword model) 
+        {
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            if (userId != default)
+            {
+                await _userService.ChangePassword(userId, model); 
             }
             else
                 throw new Exception("you are not authorized");
 
         }
+
+
 
         // Гет запрос возвращение списка пользователей из БД
         [HttpGet]

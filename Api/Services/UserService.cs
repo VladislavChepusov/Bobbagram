@@ -35,6 +35,49 @@ namespace Api.Services
             return t.Entity.Id;
         }
 
+
+        // Изменение пароля пользователя
+        public async Task ChangePassword(Guid userId, ChangeUserPassword model)
+        {
+           //var user = GetUserById(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+                throw new UserNotFoundException();
+
+            if (!HashHelper.Verify(model.OldPassword, user.PasswordHash))
+                throw new Exception("password is incorrect");
+
+            user.PasswordHash = HashHelper.GetHash(model.NewPassword);
+            await CloseAllSessionByIdUser(userId); //Закрыть все сесси пользователя (Оставить??)
+            await _context.SaveChangesAsync();
+
+           
+        }
+
+
+        // Изменение данных о пользовате в БД(УБРАТЬ ХАРДКОД)
+        public async Task ChangeUser(Guid userId, ChangeUser model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(c => c.Id == userId);
+             if (user == null)
+                throw new UserNotFoundException();
+
+            if (user.About != model.About)
+                user.About = model.About;
+
+            if (user.Email != model.Email)
+                user.Email = model.Email;
+
+            if (user.Name != model.Name)
+                user.Name = model.Name;
+
+            if  (user.BirthDate != model.BirthDate)
+                 user.BirthDate = model.BirthDate;
+            await _context.SaveChangesAsync();
+           
+        }
+
+
         // Вернуть список пользователей
         public async Task<IEnumerable<UserAvatarModel>> GetUsers() =>
                     await _context.Users.AsNoTracking()
@@ -44,12 +87,16 @@ namespace Api.Services
                     .ToListAsync();
 
 
-        // Проверерть существует ли такой пользователь 
+        // Проверерть существует ли такой пользователь  по емайлу
         public async Task<bool> CheckUserExist(string email)
         {
-
             return await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
+        }
 
+        // Проверерть существует ли такой пользователь по имени 
+        public async Task<bool> CheckUserNameExist(string username)
+        {
+            return await _context.Users.AnyAsync(x => x.Name.ToLower() == username.ToLower());
         }
 
         // Добавление аватарки пользователя
@@ -79,17 +126,16 @@ namespace Api.Services
             return atach;
         }
 
-        // Закрыть сессию пользователя!!
+        // Закрыть сессии пользователя
         public async Task CloseAllSessionByIdUser(Guid id_user)
         {
-            // Взять метол  GetSessionById !!!!!!!!!!!!!!!
-            var session = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == id_user);
+            var session = await _context.UserSessions.Where(x => x.UserId == id_user).ToListAsync();  
             if (session != null)
-            {
-                _context.UserSessions.Remove(session);
+            {   
+                _context.UserSessions.RemoveRange(session);    
                 await _context.SaveChangesAsync();
             }
-        }
+        }   
   
         // Удалить пользователя из БД
         public async Task DeleteAccount(Guid id)
