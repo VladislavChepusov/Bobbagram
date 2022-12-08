@@ -6,18 +6,13 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    public class Post
+    public class Comment
     {
         public Guid Id { get; set; }
-        public string? Description { get; set; }
+        public Guid PostId { get; set; }
         public Guid AuthorId { get; set; }
         public virtual User Author { get; set; } = null!;
         public DateTimeOffset Created { get; set; }
-
-
-        public virtual ICollection<PostContent>? PostContents { get; set; }
-        public virtual ICollection<Comment>? PostComments { get; set; }
-
-
+        public string CommentText { get; set; } = null!;
     }
 }

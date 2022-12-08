@@ -23,4 +23,16 @@
         }
 
     }
+
+    public class CommentNotFoundException : NotFoundException
+    {
+        public CommentNotFoundException()
+        {
+            Model = "Comment";
+        }
+
+    }
+
+
+
 }

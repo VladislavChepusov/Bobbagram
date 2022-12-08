@@ -23,10 +23,10 @@ namespace Api.Services
             _context = context;
         }
 
-        public async Task CreatePost(CreatePostRequest request)
+        public async Task CreatePost(Guid User_id,CreatePostRequest request)
         {
             var model = _mapper.Map<CreatePostModel>(request);
-
+            model.AuthorId = User_id;
             model.Contents.ForEach(x =>
             {
                 x.AuthorId = model.AuthorId;
@@ -52,11 +52,13 @@ namespace Api.Services
         }
 
 
-        public async Task<List<PostModel>> GetPosts(int skip, int take)
+        public async Task<List<PostModel>> GetAllPosts(int skip, int take)
         {
             var posts = await _context.Posts
                 .Include(x => x.Author).ThenInclude(x => x.Avatar)
-                .Include(x => x.PostContents).AsNoTracking().OrderByDescending(x => x.Created).Skip(skip).Take(take)
+                .Include(x => x.PostContents)
+                .Include(x => x.PostComments)
+                .AsNoTracking().OrderByDescending(x => x.Created).Skip(skip).Take(take)
                 .Select(x => _mapper.Map<PostModel>(x))
                 .ToListAsync();
 
@@ -67,7 +69,9 @@ namespace Api.Services
         {
             var post = await _context.Posts
                   .Include(x => x.Author).ThenInclude(x => x.Avatar)
-                  .Include(x => x.PostContents).AsNoTracking()
+                  .Include(x => x.PostContents)
+                  .Include(x => x.PostComments)
+                  .AsNoTracking()
                   .Where(x => x.Id == id)
                   .Select(x => _mapper.Map<PostModel>(x))
                   .FirstOrDefaultAsync();

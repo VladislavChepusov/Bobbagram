@@ -29,25 +29,26 @@ namespace Api.Controllers
             });
         }
 
+        // Назову жэто потом "Актуально"(отсортировать по дате)
 
         [HttpGet]
-        public async Task<List<PostModel>> GetPosts(int skip = 0, int take = 10)
-              => await _postService.GetPosts(skip, take);
+        public async Task<List<PostModel>> GetAllPosts(int skip = 0, int take = 10)
+              => await _postService.GetAllPosts(skip, take);
         [HttpGet]
         public async Task<PostModel> GetPostById(Guid id)
             => await _postService.GetPostById(id);
 
+
+
+        // Запрос на создание поста
         [HttpPost]
         public async Task CreatePost(CreatePostRequest request)
         {
-            if (!request.AuthorId.HasValue)
-            {
-                var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
-                if (userId == default)
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            if (userId == default)
                     throw new Exception("not authorize");
-                request.AuthorId = userId;
-            }
-            await _postService.CreatePost(request);
+    
+            await _postService.CreatePost(userId,request);
 
         }
 
