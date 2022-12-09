@@ -27,6 +27,22 @@ namespace DAL
                .HasIndex(f => f.Name)
                .IsUnique();
 
+            /////
+            modelBuilder
+                  .Entity<Subscription>()
+                  .HasOne(it => it.User)
+                       .WithMany(it => it.Subscriptions)
+                       .HasForeignKey(it => it.UserId)
+                       .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder
+                .Entity<Subscription>()
+                .HasOne(it => it.SubUser)
+                .WithMany(it => it.Subscribers)
+                .HasForeignKey(it => it.SubUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            ////
+            ///
             //сопоставление с таблицей
             modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
             modelBuilder.Entity<PostContent>().ToTable(nameof(PostContent));
@@ -48,6 +64,7 @@ namespace DAL
         public DbSet<Post> Posts => Set<Post>();
         public DbSet<PostContent> PostContents => Set<PostContent>();
         public DbSet<Comment> Comments => Set<Comment>();
+        public DbSet<Subscription> Subscriptions => Set<Subscription>();
 
 
     }

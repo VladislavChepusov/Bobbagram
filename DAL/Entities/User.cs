@@ -21,5 +21,8 @@ namespace DAL.Entities
         public virtual ICollection<UserSession>? Sessions { get; set; }
         public virtual ICollection<Post>? Posts { get; set; }
 
+       public virtual ICollection<Subscription>? Subscriptions { get; set; }
+       public virtual ICollection<Subscription>? Subscribers { get; set; }
+
     }
 }

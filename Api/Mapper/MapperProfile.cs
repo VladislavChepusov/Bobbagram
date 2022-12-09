@@ -2,6 +2,7 @@
 using Api.Models.Attach;
 using Api.Models.Comment;
 using Api.Models.Post;
+using Api.Models.Subscriptions;
 using Api.Models.User;
 using AutoMapper;
 using Common;
@@ -62,6 +63,18 @@ namespace Api.Mapper
             CreateMap<CreatePostModel, Post>()
                 .ForMember(d => d.PostContents, m => m.MapFrom(s => s.Contents))
                 .ForMember(d => d.Created, m => m.MapFrom(s => DateTime.UtcNow));
+
+
+
+            CreateMap<SubscriptionRequest, Subscription>()
+            .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
+            .ForMember(d => d.Created, m => m.MapFrom(s => DateTime.UtcNow));
+
+            CreateMap<SubscriptionModel, Subscription>()
+                .ForMember(d => d.User, m => m.MapFrom(s => s.User))
+                //.ForMember(d => d.Created, m => m.MapFrom(s => DateTime.UtcNow))
+                .ForMember(d => d.SubUser, m => m.MapFrom(s => s.SubUser))
+                .ReverseMap();
         }
     }
 }

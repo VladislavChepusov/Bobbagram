@@ -77,7 +77,8 @@ internal class Program
         builder.Services.AddScoped<AuthService>();// Добавление сервис авторизации пользователя
         builder.Services.AddScoped<PostService>();// Добавление сервис постов пользователя
         builder.Services.AddScoped<LinkGeneratorService>();// Добавление сервиса генерации ссылок (аватар,контент)
-        builder.Services.AddScoped<CommentService>(); // Добавоение сервиса для комментариев 
+        builder.Services.AddScoped<CommentService>(); // Добавление сервиса для комментариев 
+        builder.Services.AddScoped<SubscriptionService>(); // Добавление сервиса подписов
 
         // Добавим middleware для JSON Web Token(Аутентификация),чтобы система знала как проверять токен
         builder.Services.AddAuthentication(o =>
