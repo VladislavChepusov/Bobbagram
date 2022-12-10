@@ -12,5 +12,8 @@ namespace Api.Models.Post
         public UserAvatarModel Author { get; set; } = null!;
         public List<AttachExternalModel>? Contents { get; set; } = new List<AttachExternalModel>();
         public List<GetCommentsRequestModel>? Comments { get; set; } = new List<GetCommentsRequestModel>();
+
+        public int LikesCount { get; set; }
+        //public int CommentsCount { get; set; }//????
     }
 }

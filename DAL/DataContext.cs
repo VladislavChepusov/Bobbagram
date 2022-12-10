@@ -15,9 +15,11 @@ namespace DAL
         public DataContext(DbContextOptions<DataContext> options):base(options)
         {
         }
-        //Модификации (Поле Емеил и Юзернейм доожны быть уникальным)
+        
+        // Уточнения для создания моделей БД
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Модификации (Поле Емеил и Юзернейм доожны быть уникальным)
             modelBuilder
                 .Entity<User>()
                 .HasIndex(f => f.Email)
@@ -27,14 +29,13 @@ namespace DAL
                .HasIndex(f => f.Name)
                .IsUnique();
 
-            /////
+            /////Для сложной связи подписчиков
             modelBuilder
                   .Entity<Subscription>()
                   .HasOne(it => it.User)
                        .WithMany(it => it.Subscriptions)
                        .HasForeignKey(it => it.UserId)
                        .OnDelete(DeleteBehavior.NoAction);
-
             modelBuilder
                 .Entity<Subscription>()
                 .HasOne(it => it.SubUser)
@@ -60,11 +61,13 @@ namespace DAL
         public DbSet<UserSession> UserSessions => Set<UserSession>();
         public DbSet<Attach> Attaches => Set<Attach>();
         public DbSet<Avatar> Avatars => Set<Avatar>();
-
         public DbSet<Post> Posts => Set<Post>();
         public DbSet<PostContent> PostContents => Set<PostContent>();
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Subscription> Subscriptions => Set<Subscription>();
+       
+        public DbSet<CommentLike> CommentLikes => Set<CommentLike>();
+        public DbSet<PostLike> PostLikes => Set<PostLike>();
 
 
     }

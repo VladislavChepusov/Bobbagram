@@ -1,6 +1,7 @@
 ﻿using Api.Mapper.MapperActions;
 using Api.Models.Attach;
 using Api.Models.Comment;
+using Api.Models.Likes;
 using Api.Models.Post;
 using Api.Models.Subscriptions;
 using Api.Models.User;
@@ -35,7 +36,8 @@ namespace Api.Mapper
 
             CreateMap<Post, PostModel>()
                 .ForMember(d => d.Contents, m => m.MapFrom(d => d.PostContents))
-                .ForMember(d => d.Comments, m => m.MapFrom(d => d.PostComments));
+                .ForMember(d => d.Comments, m => m.MapFrom(d => d.PostComments))
+                .ForMember(d => d.LikesCount, m => m.MapFrom(s => s.Likes!.Count)); ;
 
 
 
@@ -75,6 +77,24 @@ namespace Api.Mapper
                 //.ForMember(d => d.Created, m => m.MapFrom(s => DateTime.UtcNow))
                 .ForMember(d => d.SubUser, m => m.MapFrom(s => s.SubUser))
                 .ReverseMap();
+
+
+
+
+            CreateMap<LikeRequest, PostLike>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
+                .ForMember(d => d.PostId, m => m.MapFrom(s => s.EntityId))
+                .ReverseMap(); 
+
+            CreateMap<LikeRequest, CommentLike>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
+                .ForMember(d => d.CommentId, m => m.MapFrom(s => s.EntityId))
+                .ReverseMap();
+            /*
+            CreateMap<LikeRequest, PostLike>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
+                .ReverseMap();
+            */
         }
     }
 }

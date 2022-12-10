@@ -14,5 +14,8 @@ namespace DAL.Entities
         public virtual User Author { get; set; } = null!;
         public DateTimeOffset Created { get; set; }
         public string CommentText { get; set; } = null!;
+
+        public ICollection<CommentLike>? Likes { get; set; }
     }
 }
+
