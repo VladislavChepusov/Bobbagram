@@ -4,6 +4,7 @@ using DAL.Entities;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Api.Exceptions;
+using System.Collections.Generic;
 
 namespace Api.Services
 {
@@ -118,7 +119,7 @@ namespace Api.Services
 
 
 
-        // Мб придется дописать...
+      
         public async Task<IEnumerable<PostLike>> GetPostLikes(Guid postId)
         {
            
@@ -128,7 +129,9 @@ namespace Api.Services
                 .ToListAsync();
             return likes;
         }
-        
+
+
+
         public async Task<IEnumerable<CommentLike>> GetCommentLikes(Guid commentId)
         {
             var likes = await _context.CommentLikes.AsNoTracking()

@@ -1,7 +1,9 @@
 ﻿using Api.Configs;
 using Api.Exceptions;
 using Api.Models.Attach;
+using Api.Models.Likes;
 using Api.Models.Post;
+using Api.Models.Subscriptions;
 using Api.Models.User;
 using AutoMapper;
 using DAL;
@@ -52,7 +54,20 @@ namespace Api.Services
         }
 
 
-        public async Task<List<PostModel>> GetAllPosts(int skip, int take)
+        public async Task DeletePost(Guid User_id, Guid Post_id)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(x => x.Id == Post_id);
+            if (post == null)
+                throw new PostNotFoundException();
+            if (post.AuthorId != User_id)
+                throw new Exception("You are not the author of the post");
+ 
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+
+        }
+
+            public async Task<List<PostModel>> GetAllPosts(int skip, int take)
         {
             var posts = await _context.Posts
                 .Include(x => x.Author).ThenInclude(x => x.Avatar)
@@ -63,6 +78,65 @@ namespace Api.Services
                 .ToListAsync();
 
             return posts;
+        }
+
+        public async Task<List<PostModel>> GetSubPosts(int skip, int take, Guid userId)
+        {
+            //var user = await _context.Users.Include(x => x.Subscribes).FirstOrDefaultAsync(x => x.Id == userId);
+            var subs = await _context.Subscriptions
+                .Where(x => x.UserId == userId)
+                .Select(x => _mapper.Map<SubscriptionModel>(x)).ToListAsync();
+
+            List<Guid> subscribesIds = new List<Guid>();
+
+            foreach (var sub in subs)
+            {
+                subscribesIds.Add(sub.SubUserId);
+            }
+
+            List<PostModel> posts = new List<PostModel>();
+
+            posts = await _context.Posts
+            .Include(x => x.Author).ThenInclude(x => x.Avatar)
+            .Include(x => x.PostComments).ThenInclude(x => x.Author)
+            .Include(x => x.PostContents)
+            .AsNoTracking()
+            .OrderByDescending(x => x.Created).Skip(skip).Take(take)
+            .Where(x => subscribesIds.Contains(x.AuthorId))
+            .Select(x => _mapper.Map<PostModel>(x))
+            .ToListAsync();
+      
+            foreach (var post in posts)
+            {
+                post.LikesCount = (await GetPostLikes(post.Id)).Count();
+            }
+            return posts;
+        }
+
+        ///NTAAAAAAAKKKK
+        public async Task<IEnumerable<PostLike>> GetPostLikes(Guid postId)
+        {
+
+            var likes = await _context.PostLikes.AsNoTracking()
+                .Where(x => x.PostId == postId)
+                .Select(x => _mapper.Map<PostLike>(x))
+                .ToListAsync();
+            return likes;
+        }
+
+
+ 
+        public async Task ChangePost (Guid postId,ChangePost newdata)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(x => x.Id == newdata.Id);
+            if (post == null)
+                throw new PostNotFoundException();
+            if (post.AuthorId != postId)
+                throw new Exception("You are not the author of the post");
+
+            post.Description = newdata.Description;
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<PostModel> GetPostById(Guid id)

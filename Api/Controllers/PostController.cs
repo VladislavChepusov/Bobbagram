@@ -29,11 +29,34 @@ namespace Api.Controllers
             });
         }
 
-        // Назову жэто потом "Актуально"(отсортировать по дате)
+        // Назову жэто потом "Актуальное/Интересное"
 
         [HttpGet]
         public async Task<List<PostModel>> GetAllPosts(int skip = 0, int take = 10)
               => await _postService.GetAllPosts(skip, take);
+
+
+        [HttpGet]
+        public async Task<List<PostModel>> GetSubscriptionPosts(int skip = 0, int take = 10)
+        {
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            if (userId == default)
+                throw new Exception("not authorize");
+
+            return  await _postService.GetSubPosts(skip, take, userId);
+        }
+
+        [HttpPut]
+        public async Task ChangePosts(ChangePost newData)
+        {
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            if (userId == default)
+                throw new Exception("not authorize");
+
+             await _postService.ChangePost(userId, newData);
+        }
+
+
         [HttpGet]
         public async Task<PostModel> GetPostById(Guid id)
             => await _postService.GetPostById(id);
@@ -49,6 +72,20 @@ namespace Api.Controllers
                     throw new Exception("not authorize");
     
             await _postService.CreatePost(userId,request);
+
+        }
+
+
+
+        // Запрос на создание поста
+        [HttpDelete]
+        public async Task DeletePost(Guid PostId)
+        {
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            if (userId == default)
+                throw new Exception("not authorize");
+
+            await _postService.DeletePost(userId, PostId);
 
         }
 
