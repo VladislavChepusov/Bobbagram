@@ -63,33 +63,49 @@ namespace Api.Services
             await _context.SaveChangesAsync();
         }
 
-
-
-        public async Task<IEnumerable<SubscriptionModel>> GetSubscription(Guid subUserId)
+        // Удалят подписчиков и подписки
+        public async Task DeleteMeSub(Guid userId)
         {
-            var subscriptions = await _context.Subscriptions
-                .Include(x => x.User).ThenInclude(x => x.Avatar)
-                .Where(it => it.SubUserId == subUserId)
-                .Select(x => _mapper.Map<SubscriptionModel>(x))
-                .ToListAsync();
+            var sub = await _context.Subscriptions
+                   .Where(it => it.SubUserId == userId)
+                   .ToListAsync();
+            if (sub != null)
+                _context.Subscriptions.RemoveRange(sub);
+            var subs1 = await _context.Subscriptions
+                   .Where(it => it.UserId == userId)
+                   .ToListAsync();
 
-            if (subscriptions == null)
-                throw new Exception("Subscription not Found");
+            if (subs1 != null)
+                _context.Subscriptions.RemoveRange(subs1);
 
-            return subscriptions;
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<SubscriptionModel>> GetSubscribers(Guid userId)
         {
-            var subscribers = await _context.Subscriptions
+            var Subscribers = await _context.Subscriptions
+                .Include(x => x.User).ThenInclude(x => x.Avatar)
+                .Where(it => it.SubUserId == userId)
+                .Select(x => _mapper.Map<SubscriptionModel>(x))
+                .ToListAsync();
+
+            if (Subscribers == null)
+                throw new Exception("Subscribers not Found");
+
+            return Subscribers;
+        }
+
+        public async Task<IEnumerable<SubscriptionModel>> GetSubscription(Guid userId)
+        {
+            var Subscription = await _context.Subscriptions
                 .Include(x => x.SubUser).ThenInclude(x => x.Avatar)
                 .Where(it => it.UserId == userId)
                 .Select(x => _mapper.Map<SubscriptionModel>(x))
                 .ToListAsync();
-            if (subscribers == null)
+            if (Subscription == null)
                 throw new Exception("Subscription not Found");
 
-            return subscribers;
+            return Subscription;
         }
     }
 }

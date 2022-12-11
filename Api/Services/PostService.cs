@@ -80,6 +80,23 @@ namespace Api.Services
             return posts;
         }
 
+
+
+        public async Task<List<PostModel>> GetPostByUserId(Guid userId)
+        {
+            var posts = await _context.Posts
+                .Include(x => x.Author).ThenInclude(x => x.Avatar)
+                .Include(x => x.PostContents)
+                .Include(x => x.PostComments)
+                .Where(x => x.AuthorId == userId)
+                .AsNoTracking().OrderByDescending(x => x.Created)
+                .Select(x => _mapper.Map<PostModel>(x))
+                .ToListAsync();
+
+            return posts;
+        }
+
+
         public async Task<List<PostModel>> GetSubPosts(int skip, int take, Guid userId)
         {
             //var user = await _context.Users.Include(x => x.Subscribes).FirstOrDefaultAsync(x => x.Id == userId);
@@ -113,7 +130,9 @@ namespace Api.Services
             return posts;
         }
 
-        ///NTAAAAAAAKKKK
+
+
+        ///TAAAAAAAKKKK
         public async Task<IEnumerable<PostLike>> GetPostLikes(Guid postId)
         {
 

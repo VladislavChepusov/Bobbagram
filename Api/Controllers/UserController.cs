@@ -14,10 +14,11 @@ namespace Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
-
-        public UserController(UserService userService, LinkGeneratorService links)
+        private readonly SubscriptionService _subService;
+        public UserController(UserService userService, SubscriptionService subService, LinkGeneratorService links)
         {
             _userService = userService;
+            _subService = subService;
 
             links.LinkAvatarGenerator = x =>
             Url.ControllerAction<AttachController>(nameof(AttachController.GetUserAvatar), new
@@ -42,8 +43,11 @@ namespace Api.Controllers
             //var SessionId = User.GetClaimValue<Guid>(ClaimNames.SessionId);
             if (userId != default)
             {
-                await _userService.DeleteAccount(userId);
+               await _subService.DeleteMeSub(userId);
+               await _userService.DeleteAccount(userId);
+
                // await _userService.CloseAllSessionByIdUser(SessionId);
+
             }
             else
                 throw new Exception("you are not authorized");
@@ -72,8 +76,20 @@ namespace Api.Controllers
 
 
 
+        // Выход пользака
+        [HttpDelete]
+        public async Task LogOut()
+        {
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+            if (userId != default)
+            {
+                await _userService.CloseAllSessionByIdUser(userId);
+            }
+            else
+                throw new Exception("you are not authorized");
 
-        
+        }
+
 
         // Изменение паролей на аккаунте
         [HttpPut]

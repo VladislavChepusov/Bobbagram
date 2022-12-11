@@ -58,9 +58,13 @@ namespace Api.Controllers
 
 
         [HttpGet]
+        public async Task<List<PostModel>> GetPostByUserId(Guid id)
+           => await _postService.GetPostByUserId(id);
+ 
+
+        [HttpGet]
         public async Task<PostModel> GetPostById(Guid id)
             => await _postService.GetPostById(id);
-
 
 
         // Запрос на создание поста
@@ -74,8 +78,6 @@ namespace Api.Controllers
             await _postService.CreatePost(userId,request);
 
         }
-
-
 
         // Запрос на создание поста
         [HttpDelete]

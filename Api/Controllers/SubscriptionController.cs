@@ -60,7 +60,7 @@ namespace Api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SubscriptionModel>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IEnumerable<SubscriptionModel>> GetSubscribers(Guid subUserId)
-            => await _subscriptionService.GetSubscribers(subUserId);
+        public async Task<IEnumerable<SubscriptionModel>> GetSubscribers(Guid userId)
+            => await _subscriptionService.GetSubscribers(userId);
     }
 }
