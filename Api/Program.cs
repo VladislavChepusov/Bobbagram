@@ -57,9 +57,9 @@ internal class Program
                 }
             });
 
-            c.SwaggerDoc("Auth", new OpenApiInfo { Title = "Auth" });
-            c.SwaggerDoc("Api", new OpenApiInfo { Title = "Api" });
-        });
+            c.SwaggerDoc("Auth", new OpenApiInfo { Title = "Auth", Version = "v1" });
+            c.SwaggerDoc("Api", new OpenApiInfo { Title = "Api" ,Version = "v1"});
+            });
 
 
         // Подключение к БД
@@ -113,7 +113,15 @@ internal class Program
         });
 
 
+        builder.Services.AddCors(options => options.AddPolicy("AllowLocalhost7027", builder => builder
+                    .WithOrigins("https://localhost:7027")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod())
+               );
+
         var app = builder.Build();
+
+        app.UseCors("AllowLocalhost7027");
 
         // Указываем,что при каждом запуске приложения должны выполняться миграции,чтобы обнолвения происходили сами
         // Создаем отдельный Scope в рамках которого вызываем миграции
