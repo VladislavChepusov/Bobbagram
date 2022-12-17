@@ -1,4 +1,5 @@
-﻿using Api.Models.Attach;
+﻿using Api.Exceptions;
+using Api.Models.Attach;
 using Api.Models.User;
 using Api.Services;
 using Common.Consts;
@@ -64,9 +65,10 @@ namespace Api.Controllers
                 var user = await _userService.GetUser(userId);
 
                 if (await _userService.CheckUserExist(model.Email) && model.Email != user.Email)
-                    throw new Exception("A user with this email already exists");
+                    throw new EmailIsExistException();
+
                 if (await _userService.CheckUserNameExist(model.Name) && model.Name != user.Name)
-                    throw new Exception("A user with this name already exists");
+                    throw new UserNameIsExistException();
 
                 await _userService.ChangeUser(userId, model); 
             }
