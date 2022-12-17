@@ -1,4 +1,5 @@
-﻿using Api.Models.Token;
+﻿using Api.Exceptions;
+using Api.Models.Token;
 using Api.Models.User;
 using Api.Services;
 using Microsoft.AspNetCore.Http;
@@ -37,10 +38,11 @@ namespace Api.Controllers
         [HttpPost]
         public async Task RegisterUser(CreateUserModel model)
         {
-            if (await _userService.CheckUserExist(model.Email))
-                throw new Exception("A user with this email already exists");
+            if (await _userService.CheckUserExist(model.Email))   
+                throw new EmailIsExistException();
             if (await _userService.CheckUserNameExist(model.Name))
-                throw new Exception("A user with this name already exists");
+                //throw new Exception("A user with this name already exists");
+                throw new UserNameIsExistException();
 
             await _userService.CreateUser(model);
 

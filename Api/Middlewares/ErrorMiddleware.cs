@@ -24,6 +24,13 @@ namespace Api.Middlewares
                 //await context.Response.CompleteAsync()
             }
 
+            catch (IsExistException ex)
+            {
+                context.Response.StatusCode = 409;
+                await context.Response.WriteAsJsonAsync(ex.Message);
+                //await context.Response.CompleteAsync()
+            }
+
 
         }
     }
