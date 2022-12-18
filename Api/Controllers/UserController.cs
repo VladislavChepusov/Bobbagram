@@ -51,7 +51,8 @@ namespace Api.Controllers
 
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
+            //throw new Exception("you are not authorized");
         }
 
         //  изменение данных у юзера
@@ -73,7 +74,7 @@ namespace Api.Controllers
                 await _userService.ChangeUser(userId, model); 
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
         }
 
 
@@ -88,7 +89,7 @@ namespace Api.Controllers
                 await _userService.CloseAllSessionByIdUser(userId);
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
 
         }
 
@@ -103,7 +104,7 @@ namespace Api.Controllers
                 await _userService.ChangePassword(userId, model); 
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
 
         }
 
@@ -125,7 +126,8 @@ namespace Api.Controllers
                 return await _userService.GetUser(userId);
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
+            //throw new Exception("you are not authorized");
 
         }
 
@@ -152,7 +154,8 @@ namespace Api.Controllers
                 }
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
+            //throw new Exception("you are not authorized");
         }
 
     }

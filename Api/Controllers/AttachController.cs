@@ -1,4 +1,5 @@
-﻿using Api.Models.Attach;
+﻿using Api.Exceptions;
+using Api.Models.Attach;
 using Api.Services;
 using Common.Consts;
 using Common.Extentions;
@@ -40,6 +41,10 @@ namespace Api.Controllers
 
         private FileStreamResult RenderAttach(AttachModel attach, bool download)
         {
+
+            if (attach == null)
+                throw new ContentNotFoundException();
+
             var fs = new FileStream(attach.FilePath, FileMode.Open);
             var ext = Path.GetExtension(attach.Name);
             if (download)

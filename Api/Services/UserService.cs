@@ -45,7 +45,9 @@ namespace Api.Services
                 throw new UserNotFoundException();
 
             if (!HashHelper.Verify(model.OldPassword, user.PasswordHash))
-                throw new Exception("password is incorrect");
+                throw new PasswordException();
+
+
 
             user.PasswordHash = HashHelper.GetHash(model.NewPassword);
             await CloseAllSessionByIdUser(userId); //Закрыть все сесси пользователя (Оставить??)

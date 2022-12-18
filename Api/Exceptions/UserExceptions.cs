@@ -14,6 +14,20 @@
         public override string Message => $"Такой {Model} уже занят";
     }
 
+
+    public class AuthorizationException : Exception
+    {
+        public override string Message => $"Вы не авторизованы!";
+    }
+
+
+    public class PasswordException : Exception
+    {
+        public override string Message => $"Неверный пароль!";
+    }
+
+
+
     public class UserNameIsExistException : IsExistException
     {
         public UserNameIsExistException()
@@ -45,6 +59,15 @@
         public PostNotFoundException()
         {
             Model = "Post";
+        }
+
+    }
+
+    public class ContentNotFoundException : NotFoundException
+    {
+        public ContentNotFoundException()
+        {
+            Model = "Content";
         }
 
     }

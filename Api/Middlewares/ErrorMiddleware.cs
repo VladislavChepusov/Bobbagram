@@ -31,6 +31,20 @@ namespace Api.Middlewares
                 //await context.Response.CompleteAsync()
             }
 
+            catch (AuthorizationException ex)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsJsonAsync(ex.Message);
+               
+            }
+
+            catch (PasswordException ex)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsJsonAsync(ex.Message);
+
+            }
+
 
         }
     }
