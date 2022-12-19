@@ -1,4 +1,5 @@
-﻿using Api.Models.Attach;
+﻿using Api.Exceptions;
+using Api.Models.Attach;
 using Api.Models.Post;
 using Api.Services;
 using Common.Consts;
@@ -41,7 +42,8 @@ namespace Api.Controllers
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
 
             return  await _postService.GetSubPosts(skip, take, userId);
         }
@@ -51,7 +53,8 @@ namespace Api.Controllers
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
 
              await _postService.ChangePost(userId, newData);
         }
@@ -73,11 +76,13 @@ namespace Api.Controllers
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                    throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
     
             await _postService.CreatePost(userId,request);
 
         }
+
 
         // Запрос на создание поста
         [HttpDelete]
@@ -85,12 +90,10 @@ namespace Api.Controllers
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
 
             await _postService.DeletePost(userId, PostId);
-
         }
-
-
     }
 }

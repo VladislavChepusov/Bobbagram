@@ -60,7 +60,7 @@ namespace Api.Services
             if (post == null)
                 throw new PostNotFoundException();
             if (post.AuthorId != User_id)
-                throw new Exception("You are not the author of the post");
+                throw new AuthorRightException();
  
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
@@ -151,7 +151,7 @@ namespace Api.Services
             if (post == null)
                 throw new PostNotFoundException();
             if (post.AuthorId != postId)
-                throw new Exception("You are not the author of the post");
+                throw new AuthorRightException();
 
             post.Description = newdata.Description;
 

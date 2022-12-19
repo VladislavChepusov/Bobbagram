@@ -23,6 +23,7 @@ namespace Api.Controllers
             _userService = userService;
         }
 
+
         [HttpGet]
         [Route("{postContentId}")]
         public async Task<FileStreamResult> GetPostContent(Guid postContentId, bool download = false)
@@ -39,19 +40,17 @@ namespace Api.Controllers
         public async Task<FileStreamResult> GetCurentUserAvatar(bool download = false)
             => await GetUserAvatar(User.GetClaimValue<Guid>(ClaimNames.Id), download);
 
+
         private FileStreamResult RenderAttach(AttachModel attach, bool download)
         {
-
             if (attach == null)
                 throw new ContentNotFoundException();
-
             var fs = new FileStream(attach.FilePath, FileMode.Open);
             var ext = Path.GetExtension(attach.Name);
             if (download)
                 return File(fs, attach.MimeType, $"{attach.Id}{ext}");
             else
                 return File(fs, attach.MimeType);
-
         }
 
 
@@ -66,6 +65,7 @@ namespace Api.Controllers
             }
             return res;
         }
+
 
         // Функция загрузки одного файла (во временное хранилище)
         private async Task<MetadataModel> UploadFile(IFormFile file)

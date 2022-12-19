@@ -45,7 +45,7 @@ namespace Api.Services
             if (com == null)
                 throw new CommentNotFoundException();
             if (com.AuthorId != userId)
-                throw new Exception("you are not the owner of the comment");
+                throw new AuthorRightException();
 
             _context.Comments.Remove(com);
             await _context.SaveChangesAsync();

@@ -1,4 +1,5 @@
-﻿using Api.Models.Comment;
+﻿using Api.Exceptions;
+using Api.Models.Comment;
 using Api.Services;
 using Common.Consts;
 using Common.Extentions;
@@ -20,16 +21,17 @@ namespace Api.Controllers
             _commentService = commentService;
         }
 
+
         [HttpPost]
         [Authorize]
         public async Task CreateComment(CommentModel model)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
-
+                throw new AuthorizationException();
             await _commentService.AddCommentToPost(userId, model);
         }
+
 
         [HttpGet]
         public async Task<List<GetCommentsRequestModel>> GetComments(Guid postId)
@@ -43,12 +45,8 @@ namespace Api.Controllers
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
-
+                throw new AuthorizationException();
             await _commentService.DeleteComment(userId, comId);
         }
-
-
-
     }
 }

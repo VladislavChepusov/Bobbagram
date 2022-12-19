@@ -26,6 +26,7 @@ namespace Api.Services
             _context = context;
         }
 
+
         // Сохранение данных о пользовате в БД
         public async Task<Guid> CreateUser(CreateUserModel model)
         {
@@ -43,17 +44,11 @@ namespace Api.Services
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user == null)
                 throw new UserNotFoundException();
-
             if (!HashHelper.Verify(model.OldPassword, user.PasswordHash))
                 throw new PasswordException();
-
-
-
             user.PasswordHash = HashHelper.GetHash(model.NewPassword);
-            await CloseAllSessionByIdUser(userId); //Закрыть все сесси пользователя (Оставить??)
+            await CloseAllSessionByIdUser(userId); //Закрыть все сесси пользователя 
             await _context.SaveChangesAsync();
-
-           
         }
 
 
@@ -63,20 +58,15 @@ namespace Api.Services
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Id == userId);
              if (user == null)
                 throw new UserNotFoundException();
-
             if (user.About != model.About)
                 user.About = model.About;
-
             if (user.Email != model.Email)
                 user.Email = model.Email;
-
             if (user.Name != model.Name)
                 user.Name = model.Name;
-
             if  (user.BirthDate != model.BirthDate)
                  user.BirthDate = model.BirthDate;
-            await _context.SaveChangesAsync();
-           
+            await _context.SaveChangesAsync(); 
         }
 
 
@@ -95,11 +85,22 @@ namespace Api.Services
             return await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
         }
 
+
+        public async Task<UserAvatarModel> GetUserByName(string UserName) {
+
+            var user = await _context.Users.Include(x => x.Avatar).Include(x => x.Posts).FirstOrDefaultAsync(x => x.Name == UserName);
+            if (user == null || user == default)
+                throw new UserNotFoundException();
+            return _mapper.Map<User, UserAvatarModel>(user); ;
+        }
+           
+
         // Проверерть существует ли такой пользователь по имени 
         public async Task<bool> CheckUserNameExist(string username)
         {
             return await _context.Users.AnyAsync(x => x.Name.ToLower() == username.ToLower());
         }
+
 
         // Добавление аватарки пользователя
         public async Task AddAvatarToUser(Guid userId, MetadataModel meta, string filePath)
@@ -120,6 +121,7 @@ namespace Api.Services
             }
         }
 
+
         // Получить фотографию аватара пользователя по ID
         public async Task<AttachModel> GetUserAvatar(Guid userId)
         {
@@ -127,6 +129,7 @@ namespace Api.Services
             var atach = _mapper.Map<AttachModel>(user.Avatar);
             return atach;
         }
+
 
         // Закрыть сессии пользователя
         public async Task CloseAllSessionByIdUser(Guid id_user)
@@ -139,6 +142,7 @@ namespace Api.Services
             }
         }   
   
+
         // Удалить пользователя из БД
         public async Task DeleteAccount(Guid id)
         {
@@ -149,6 +153,7 @@ namespace Api.Services
                 await _context.SaveChangesAsync();
             }
         }
+
 
         // Возвращает пользователя по ID
         private async Task<User> GetUserById(Guid id)

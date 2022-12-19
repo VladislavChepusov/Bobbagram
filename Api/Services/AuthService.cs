@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using AutoMapper.QueryableExtensions;
 using Api.Models.Token;
+using Api.Exceptions;
 
 namespace Api.Services
 {
@@ -78,7 +79,7 @@ namespace Api.Services
                 var session = await GetSessionByRefreshToken(refreshId);
                 if (!session.IsActive)
                 {
-                    throw new Exception("session is not active");
+                    throw new SessionNotFoundException();
                 }
                 // новая сессия 
                 session.RefreshToken = Guid.NewGuid();
@@ -98,7 +99,7 @@ namespace Api.Services
             var session = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == id);
             if (session == null)
             {
-                throw new Exception("session is not found");
+                throw new SessionNotFoundException();
             }
             return session;
         }
@@ -110,7 +111,7 @@ namespace Api.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == login.ToLower());
             if (user == null)
-                throw new Exception("user not found");
+                throw new UserNotFoundException();
 
             if (!HashHelper.Verify(pass, user.PasswordHash))
                 throw new Exception("password is incorrect");
@@ -164,7 +165,7 @@ namespace Api.Services
             var session = await _context.UserSessions.Include(x => x.User).FirstOrDefaultAsync(x => x.RefreshToken == id);
             if (session == null)
             {
-                throw new Exception("session is not found");
+                throw new SessionNotFoundException();
             }
             return session;
         }

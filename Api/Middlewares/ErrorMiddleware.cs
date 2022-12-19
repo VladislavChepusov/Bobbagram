@@ -28,21 +28,30 @@ namespace Api.Middlewares
             {
                 context.Response.StatusCode = 409;
                 await context.Response.WriteAsJsonAsync(ex.Message);
-                //await context.Response.CompleteAsync()
             }
 
             catch (AuthorizationException ex)
             {
                 context.Response.StatusCode = 401;
-                await context.Response.WriteAsJsonAsync(ex.Message);
-               
+                await context.Response.WriteAsJsonAsync(ex.Message);  
             }
 
             catch (PasswordException ex)
             {
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsJsonAsync(ex.Message);
+            }
 
+            catch (AgainException ex)
+            {
+                context.Response.StatusCode = 409;
+                await context.Response.WriteAsJsonAsync(ex.Message);
+            }
+
+            catch (NoRightsException ex)
+            {
+                context.Response.StatusCode = 403;
+                await context.Response.WriteAsJsonAsync(ex.Message);
             }
 
 

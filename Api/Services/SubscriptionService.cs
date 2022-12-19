@@ -31,10 +31,11 @@ namespace Api.Services
             var sub = user.Subscriptions!.FirstOrDefault(it => it.SubUserId == newSubscription.SubUserId);
 
             if (newSubscription.SubUserId == userId)
-                throw new Exception("you can't subscribe to yourself");
+                throw new AgainSubscribeException();
+                //throw new Exception("you can't subscribe to yourself");
 
             if (sub != null)
-                throw new Exception("You have already subscribed");
+                throw new AgainSubscribeException();
 
             var Subuser = await _context.Users.Include(it => it.Subscriptions)
                .FirstOrDefaultAsync(it => it.Id == newSubscription.SubUserId);
@@ -57,7 +58,7 @@ namespace Api.Services
                 .FirstOrDefaultAsync(it => it.UserId == userId && it.SubUserId == newSubscription.SubUserId);
             
             if (sub == null)
-                throw new Exception("You have already unsubscribed");
+                throw new AgainUnSubscribeException();
 
             _context.Subscriptions.Remove(sub);
             await _context.SaveChangesAsync();
@@ -77,7 +78,6 @@ namespace Api.Services
 
             if (subs1 != null)
                 _context.Subscriptions.RemoveRange(subs1);
-
             await _context.SaveChangesAsync();
         }
 
@@ -90,7 +90,7 @@ namespace Api.Services
                 .ToListAsync();
 
             if (Subscribers == null)
-                throw new Exception("Subscribers not Found");
+                throw new SubscribersNotFoundException();
 
             return Subscribers;
         }
@@ -103,7 +103,7 @@ namespace Api.Services
                 .Select(x => _mapper.Map<SubscriptionModel>(x))
                 .ToListAsync();
             if (Subscription == null)
-                throw new Exception("Subscription not Found");
+                throw new SubscriptionNotFoundException();
 
             return Subscription;
         }

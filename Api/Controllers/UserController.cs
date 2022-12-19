@@ -28,11 +28,18 @@ namespace Api.Controllers
             });
         }
 
+
         [HttpGet]
         public async Task<UserAvatarModel> GetUserById(Guid userId)
         {
-
             return await _userService.GetUser(userId);
+        }
+
+
+        [HttpGet]
+        public async Task<UserAvatarModel> GetUserByName(string UserName)
+        {
+            return await _userService.GetUserByName(UserName);
         }
 
 
@@ -44,23 +51,22 @@ namespace Api.Controllers
             //var SessionId = User.GetClaimValue<Guid>(ClaimNames.SessionId);
             if (userId != default)
             {
-               await _subService.DeleteMeSub(userId);
-               await _userService.DeleteAccount(userId);
-
-               // await _userService.CloseAllSessionByIdUser(SessionId);
-
+                await _subService.DeleteMeSub(userId);
+                await _userService.DeleteAccount(userId);
+                // await _userService.CloseAllSessionByIdUser(SessionId);
             }
             else
                 throw new AuthorizationException();
             //throw new Exception("you are not authorized");
         }
 
+
         //  изменение данных у юзера
         [HttpPut]
-        public async Task ChangeMyAccount(ChangeUser model) 
+        public async Task ChangeMyAccount(ChangeUser model)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
-            
+
             if (userId != default)
             {
                 var user = await _userService.GetUser(userId);
@@ -71,12 +77,11 @@ namespace Api.Controllers
                 if (await _userService.CheckUserNameExist(model.Name) && model.Name != user.Name)
                     throw new UserNameIsExistException();
 
-                await _userService.ChangeUser(userId, model); 
+                await _userService.ChangeUser(userId, model);
             }
             else
                 throw new AuthorizationException();
         }
-
 
 
         // Выход пользака
@@ -96,12 +101,12 @@ namespace Api.Controllers
 
         // Изменение паролей на аккаунте
         [HttpPut]
-        public async Task ChangeMyPassword(ChangeUserPassword model) 
+        public async Task ChangeMyPassword(ChangeUserPassword model)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId != default)
             {
-                await _userService.ChangePassword(userId, model); 
+                await _userService.ChangePassword(userId, model);
             }
             else
                 throw new AuthorizationException();
@@ -109,10 +114,9 @@ namespace Api.Controllers
         }
 
 
-
         // Гет запрос возвращение списка пользователей из БД
         [HttpGet]
-        public async Task<IEnumerable<UserAvatarModel>> GetUsers() 
+        public async Task<IEnumerable<UserAvatarModel>> GetUsers()
             => await _userService.GetUsers();
 
 
@@ -128,8 +132,8 @@ namespace Api.Controllers
             else
                 throw new AuthorizationException();
             //throw new Exception("you are not authorized");
-
         }
+
 
         // Пост запрос добавления аватрки пользователю 
         [HttpPost]
@@ -140,11 +144,11 @@ namespace Api.Controllers
             {
                 var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), model.TempId.ToString()));
                 if (!tempFi.Exists)
-                    throw new Exception("file not found");
+                    throw new ContentNotFoundException();
                 else
                 {
                     // постояная папка attaches в проекте
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "attaches", model.TempId.ToString()); 
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "attaches", model.TempId.ToString());
                     var destFi = new FileInfo(path);
                     if (destFi.Directory != null && !destFi.Directory.Exists)
                         destFi.Directory.Create();
@@ -160,4 +164,3 @@ namespace Api.Controllers
 
     }
 }
-  

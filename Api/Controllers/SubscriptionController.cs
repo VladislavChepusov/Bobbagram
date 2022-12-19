@@ -1,4 +1,5 @@
-﻿using Api.Models.Subscriptions;
+﻿using Api.Exceptions;
+using Api.Models.Subscriptions;
 using Api.Services;
 using Common.Consts;
 using Common.Extentions;
@@ -33,8 +34,10 @@ namespace Api.Controllers
                 await _subscriptionService.Subscribe(request, userId);
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
+            //throw new Exception("you are not authorized");
         }
+
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -47,8 +50,10 @@ namespace Api.Controllers
                 await _subscriptionService.UnSubscribe(request, userId);
             }
             else
-                throw new Exception("you are not authorized");
+                throw new AuthorizationException();
+            //throw new Exception("you are not authorized");
         }
+
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SubscriptionModel>))]

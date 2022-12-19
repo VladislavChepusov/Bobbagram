@@ -1,4 +1,5 @@
-﻿using Api.Models.Likes;
+﻿using Api.Exceptions;
+using Api.Models.Likes;
 using Api.Services;
 using Common.Consts;
 using Common.Extentions;
@@ -22,45 +23,48 @@ namespace Api.Controllers
         }
 
 
- 
-
-
         [HttpPost]
         public async Task LikeThePost(LikeRequest likeRequest)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
             await _likeService.AddLikePost(userId,likeRequest);
         }
+
 
         [HttpPost]
         public async Task LikeTheComment(LikeRequest likeRequest)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
             await _likeService.AddLikeComment(userId, likeRequest);
         }
+
 
         [HttpDelete]
         public async Task DeleteLikeFromPost(LikeRequest likeRequest)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
             await _likeService.DeleteLikePost(userId, likeRequest);
         }
+
 
         [HttpDelete]
         public async Task DeleteLikeFromComment(LikeRequest likeRequest)
         {
             var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
             if (userId == default)
-                throw new Exception("not authorize");
+                throw new AuthorizationException();
+            //throw new Exception("not authorize");
             await _likeService.DeleteLikeComment(userId, likeRequest);
         }
-
 
 
         [HttpGet]
@@ -69,7 +73,6 @@ namespace Api.Controllers
             return await _likeService.GetPostLikes(postId);
         }
 
-  
 
         [HttpGet]
         public async Task<IEnumerable<CommentLike>> GetCommentLikes(Guid commentId)

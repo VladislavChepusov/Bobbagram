@@ -36,7 +36,7 @@ namespace Api.Services
             
             var isExist = post.Likes!.FirstOrDefault(it => it.UserId == userId);
             if (isExist != null)
-                throw new Exception("Like already exists");
+                throw new AgainLikeException();
             
             var dblike = _mapper.Map<PostLike>(newLike);
             dblike.User = user;
@@ -63,7 +63,7 @@ namespace Api.Services
 
             var isExist = comment.Likes!.FirstOrDefault(it => it.UserId == userId);
             if (isExist != null)
-                throw new Exception("Like already exists");
+                throw new AgainLikeException();
 
             var dblike = _mapper.Map<CommentLike>(newLike);
             dblike.User = user;
@@ -93,7 +93,7 @@ namespace Api.Services
                
             }
             else
-            throw new Exception("You didn't like this post");
+            throw new LikeNotFoundException();
         }
 
 
@@ -114,7 +114,7 @@ namespace Api.Services
 
             }
             else
-                throw new Exception("You didn't like this comment");
+                throw new LikeNotFoundException();
         }
 
 
