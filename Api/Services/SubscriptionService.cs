@@ -5,6 +5,7 @@ using DAL;
 using System.Runtime.InteropServices;
 using Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Api.Models.User;
 
 namespace Api.Services
 {
@@ -84,6 +85,7 @@ namespace Api.Services
         public async Task<IEnumerable<SubscriptionModel>> GetSubscribers(Guid userId)
         {
             var Subscribers = await _context.Subscriptions
+                .Include(x => x.User).ThenInclude(x => x.Posts)
                 .Include(x => x.User).ThenInclude(x => x.Avatar)
                 .Where(it => it.SubUserId == userId)
                 .Select(x => _mapper.Map<SubscriptionModel>(x))
@@ -98,13 +100,15 @@ namespace Api.Services
         public async Task<IEnumerable<SubscriptionModel>> GetSubscription(Guid userId)
         {
             var Subscription = await _context.Subscriptions
+                .Include(x => x.SubUser).ThenInclude(x => x.Posts)
                 .Include(x => x.SubUser).ThenInclude(x => x.Avatar)
                 .Where(it => it.UserId == userId)
                 .Select(x => _mapper.Map<SubscriptionModel>(x))
                 .ToListAsync();
-            if (Subscription == null)
-                throw new SubscriptionNotFoundException();
 
+            if (Subscription == null)
+                throw new SubscriptionNotFoundException();  
+            
             return Subscription;
         }
     }

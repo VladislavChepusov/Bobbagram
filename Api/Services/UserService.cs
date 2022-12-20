@@ -91,7 +91,7 @@ namespace Api.Services
             var user = await _context.Users.Include(x => x.Avatar).Include(x => x.Posts).FirstOrDefaultAsync(x => x.Name == UserName);
             if (user == null || user == default)
                 throw new UserNotFoundException();
-            return _mapper.Map<User, UserAvatarModel>(user); ;
+            return _mapper.Map<User, UserAvatarModel>(user); 
         }
            
 

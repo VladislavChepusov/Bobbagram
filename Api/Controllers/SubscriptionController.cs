@@ -1,4 +1,5 @@
 ﻿using Api.Exceptions;
+using Api.Migrations;
 using Api.Models.Subscriptions;
 using Api.Services;
 using Common.Consts;
@@ -17,9 +18,14 @@ namespace Api.Controllers
 
         private readonly SubscriptionService _subscriptionService;
 
-        public SubscriptionController(SubscriptionService subscriptionService)
+        public SubscriptionController(SubscriptionService subscriptionService, LinkGeneratorService links)
         {
             _subscriptionService = subscriptionService;
+            links.LinkAvatarGenerator = x =>
+            Url.ControllerAction<AttachController>(nameof(AttachController.GetUserAvatar), new
+            {
+                userId = x.Id,
+            });
         }
 
 
