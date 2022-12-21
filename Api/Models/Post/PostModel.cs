@@ -9,6 +9,9 @@ namespace Api.Models.Post
     {
         public Guid Id { get; set; }
         public string? Description { get; set; }
+
+        public DateTimeOffset Created { get; set; }
+
         public UserAvatarModel Author { get; set; } = null!;
         public List<AttachExternalModel>? Contents { get; set; } = new List<AttachExternalModel>();
         public List<GetCommentsRequestModel>? Comments { get; set; } = new List<GetCommentsRequestModel>();

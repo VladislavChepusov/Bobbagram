@@ -73,6 +73,8 @@ namespace Api.Services
                 .Include(x => x.Author).ThenInclude(x => x.Avatar)
                 .Include(x => x.PostContents)
                 .Include(x => x.PostComments)
+                 .Include(x => x.Likes)
+
                 .AsNoTracking().OrderByDescending(x => x.Created).Skip(skip).Take(take)
                 .Select(x => _mapper.Map<PostModel>(x))
                 .ToListAsync();
@@ -88,6 +90,7 @@ namespace Api.Services
                 .Include(x => x.Author).ThenInclude(x => x.Avatar)
                 .Include(x => x.PostContents)
                 .Include(x => x.PostComments)
+                .Include(x => x.Likes)
                 .Where(x => x.AuthorId == userId)
                 .AsNoTracking().OrderByDescending(x => x.Created)
                 .Select(x => _mapper.Map<PostModel>(x))
@@ -117,6 +120,7 @@ namespace Api.Services
             .Include(x => x.Author).ThenInclude(x => x.Avatar)
             .Include(x => x.PostComments).ThenInclude(x => x.Author)
             .Include(x => x.PostContents)
+            .Include(x => x.Likes)
             .AsNoTracking()
             .OrderByDescending(x => x.Created).Skip(skip).Take(take)
             .Where(x => subscribesIds.Contains(x.AuthorId))
@@ -164,6 +168,7 @@ namespace Api.Services
                   .Include(x => x.Author).ThenInclude(x => x.Avatar)
                   .Include(x => x.PostContents)
                   .Include(x => x.PostComments)
+                  .Include(x => x.Likes)
                   .AsNoTracking()
                   .Where(x => x.Id == id)
                   .Select(x => _mapper.Map<PostModel>(x))
