@@ -100,6 +100,23 @@ namespace Api.Services
         }
 
 
+
+        public async Task<List<PostModel>> GetPostByUserName(String userName)
+        {
+            var posts = await _context.Posts
+                .Include(x => x.Author).ThenInclude(x => x.Avatar)
+                .Include(x => x.PostContents)
+                .Include(x => x.PostComments)
+                .Include(x => x.Likes)
+                .Where(x => x.Author.Name == userName)
+                .AsNoTracking().OrderByDescending(x => x.Created)
+                .Select(x => _mapper.Map<PostModel>(x))
+                .ToListAsync();
+
+            return posts;
+        }
+
+
         public async Task<List<PostModel>> GetSubPosts(int skip, int take, Guid userId)
         {
             //var user = await _context.Users.Include(x => x.Subscribes).FirstOrDefaultAsync(x => x.Id == userId);

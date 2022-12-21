@@ -63,7 +63,12 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<List<PostModel>> GetPostByUserId(Guid id)
            => await _postService.GetPostByUserId(id);
- 
+
+
+        [HttpGet]
+        public async Task<List<PostModel>> GetPostByUserName(String UserName)
+          => await _postService.GetPostByUserName(UserName);
+
 
         [HttpGet]
         public async Task<PostModel> GetPostById(Guid id)
