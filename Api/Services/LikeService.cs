@@ -122,11 +122,25 @@ namespace Api.Services
       
         public async Task<IEnumerable<PostLike>> GetPostLikes(Guid postId)
         {
-           
+
+            
+
+
             var likes = await _context.PostLikes.AsNoTracking()
-                .Where(x => x.PostId == postId)
+                .Where(x => x.PostId == postId) 
                 .Select(x => _mapper.Map<PostLike>(x))
                 .ToListAsync();
+
+
+            /*
+            foreach (PostLike like in likes)
+            {
+                var user = await _context.Users
+                    .AsNoTracking().FirstOrDefaultAsync(x => x.Id == like.UserId);
+                like.User = user;
+            }
+          */
+
             return likes;
         }
 

@@ -67,20 +67,7 @@ namespace Api.Services
 
         }
 
-            public async Task<List<PostModel>> GetAllPosts(int skip, int take)
-        {
-            var posts = await _context.Posts
-                .Include(x => x.Author).ThenInclude(x => x.Avatar)
-                .Include(x => x.PostContents)
-                .Include(x => x.PostComments)
-                 .Include(x => x.Likes)
-
-                .AsNoTracking().OrderByDescending(x => x.Created).Skip(skip).Take(take)
-                .Select(x => _mapper.Map<PostModel>(x))
-                .ToListAsync();
-
-            return posts;
-        }
+      
 
 
 
@@ -117,6 +104,21 @@ namespace Api.Services
         }
 
 
+        public async Task<List<PostModel>> GetAllPosts(int skip, int take)
+        {
+            var posts = await _context.Posts
+                .Include(x => x.Author).ThenInclude(x => x.Avatar)
+                .Include(x => x.PostContents)
+                .Include(x => x.PostComments)
+                 .Include(x => x.Likes)
+
+                .AsNoTracking().OrderByDescending(x => x.Created).Skip(skip).Take(take)
+                .Select(x => _mapper.Map<PostModel>(x))
+                .ToListAsync();
+
+            return posts;
+        }
+
         public async Task<List<PostModel>> GetSubPosts(int skip, int take, Guid userId)
         {
             //var user = await _context.Users.Include(x => x.Subscribes).FirstOrDefaultAsync(x => x.Id == userId);
@@ -134,13 +136,14 @@ namespace Api.Services
             List<PostModel> posts = new List<PostModel>();
 
             posts = await _context.Posts
+            .Include(x => x.PostContents)
             .Include(x => x.Author).ThenInclude(x => x.Avatar)
             .Include(x => x.PostComments).ThenInclude(x => x.Author)
-            .Include(x => x.PostContents)
             .Include(x => x.Likes)
             .AsNoTracking()
-            .OrderByDescending(x => x.Created).Skip(skip).Take(take)
+            .OrderByDescending(x => x.Created)
             .Where(x => subscribesIds.Contains(x.AuthorId))
+            .Skip(skip).Take(take)
             .Select(x => _mapper.Map<PostModel>(x))
             .ToListAsync();
       
